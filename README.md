@@ -7,14 +7,14 @@ Bytes-first library for [BCR-2020-005](https://github.com/BlockchainCommons/Rese
 ## Install
 
 ```bash
-bun add ur
-# or: npm i ur
+bun add @qntx/ur
+# or: npm i @qntx/ur
 ```
 
 ## Usage
 
 ```ts
-import { encode, decode, Encoder, Decoder, UrType } from "ur";
+import { encode, decode, Encoder, Decoder, UrType } from "@qntx/ur";
 
 // Single-part
 const data = new TextEncoder().encode("hello");
