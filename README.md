@@ -43,7 +43,26 @@ No application type registry in core. Typed/dCBOR helpers may arrive later as op
 
 ## Status
 
-**0.1 candidate (transport).** Wire interop goldens vs bcur/ur-rs pass; `DecoderLimits` + poison are on by default. This is **not** a 1.0 enterprise freeze: public API is stabilizing, default limit numbers may change before 1.0, and fuzz/matrix hardening is still pending.
+**0.1.0 transport release candidate.** Wire interop goldens vs bcur/ur-rs pass; `DecoderLimits` + poison are on by default.
+
+This is **not** a 1.0 enterprise freeze: default limit numbers may change before 1.0; fuzz and multi-runtime CI matrices are still hardening work.
+
+## Default decoder limits
+
+| Limit                   | Default   |
+| ----------------------- | --------- |
+| `maxMessageLength`      | 1 048 576 |
+| `maxFragmentCount`      | 2 000     |
+| `maxFragmentDataLength` | 8 192     |
+| `maxBufferParts`        | 4 000     |
+| `maxReceivedParts`      | 8 000     |
+| `maxUriLen`             | 8 192     |
+
+Override via `new Decoder({ limits: { … } })` or `new FountainDecoder({ … })`. Exceeding a limit **poisons** the decoder (subsequent receives fail).
+
+## Errors
+
+Failures throw `UrError` with a stable `code` (e.g. `InvalidBytewordsChecksum`, `ResourceLimit`, `UnexpectedType`). Prefer switching on `error.code` rather than message text.
 
 ## Development
 

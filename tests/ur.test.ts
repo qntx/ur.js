@@ -32,7 +32,7 @@ test("single part ur", () => {
   expect(decoded.payload).toEqual(ur);
 });
 
-test("ur encoder first three parts", () => {
+test("ur encoder first three parts (smoke; full 20 in interop-ur-rs)", () => {
   const ur = makeMessageUr(256, "Wolf");
   const encoder = Encoder.bytes(ur, 30);
   const expected = [
