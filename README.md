@@ -41,6 +41,10 @@ const recovered = decoder.message();
 
 No application type registry in core. Typed/dCBOR helpers may arrive later as optional surface.
 
+## Status
+
+**0.1 candidate (transport).** Wire interop goldens vs bcur/ur-rs pass; `DecoderLimits` + poison are on by default. This is **not** a 1.0 enterprise freeze: public API is stabilizing, default limit numbers may change before 1.0, and fuzz/matrix hardening is still pending.
+
 ## Development
 
 ```bash
