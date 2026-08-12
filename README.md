@@ -1,6 +1,54 @@
 # ur.js
 
-A universal resource identifier (URI) parser and builder for JavaScript.
+Uniform Resources (UR) transport for JavaScript/TypeScript.
+
+Bytes-first library for [BCR-2020-005](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2020-005-ur.md) UR strings: **Bytewords**, **fountain codes**, and **single-/multi-part UR** encode/decode. Wire-compatible with [bcur](https://github.com/qntx/bcur), ur-rs, and Blockchain Commons references.
+
+## Install
+
+```bash
+bun add ur
+# or: npm i ur
+```
+
+## Usage
+
+```ts
+import { encode, decode, Encoder, Decoder, UrType } from "ur";
+
+// Single-part
+const data = new TextEncoder().encode("hello");
+const ur = encode(data, UrType.bytes());
+const { payload } = decode(ur);
+
+// Multi-part (QR animation)
+const message = new Uint8Array(200).fill(7);
+const encoder = Encoder.bytes(message, 30);
+const decoder = new Decoder();
+while (!decoder.complete) {
+  decoder.receive(encoder.nextPart());
+}
+const recovered = decoder.message();
+```
+
+## Layers
+
+| Layer | Module      | Spec             |
+| ----- | ----------- | ---------------- |
+| L1    | `bytewords` | BCR-2020-012     |
+| L2    | `fountain`  | BCR-2024-001 MUR |
+| L3    | `ur`        | BCR-2020-005     |
+
+No application type registry in core. Typed/dCBOR helpers may arrive later as optional surface.
+
+## Development
+
+```bash
+bun install
+bun run test
+bun run check
+bun run build
+```
 
 ## License
 

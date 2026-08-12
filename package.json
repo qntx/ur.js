@@ -1,7 +1,15 @@
 {
   "name": "ur",
   "version": "0.0.0",
-  "description": "A starter for creating a TypeScript package.",
+  "description": "Uniform Resources (UR) transport for JavaScript/TypeScript — Bytewords, fountain codes, and multi-part UR.",
+  "keywords": [
+    "blockchain-commons",
+    "bytewords",
+    "fountain",
+    "qr",
+    "uniform-resources",
+    "ur"
+  ],
   "homepage": "https://github.com/qntx/ur.js#readme",
   "bugs": {
     "url": "https://github.com/qntx/ur.js/issues"
@@ -28,7 +36,11 @@
     "dev": "vp pack --watch",
     "test": "vp test",
     "check": "vp check",
+    "lint": "vp check",
     "prepublishOnly": "vp run build"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.3.0"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
