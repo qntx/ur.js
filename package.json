@@ -1,5 +1,5 @@
 {
-  "name": "ur",
+  "name": "@qntx/ur",
   "version": "0.1.0",
   "description": "Uniform Resources (UR) transport for JavaScript/TypeScript — Bytewords, fountain codes, and multi-part UR.",
   "keywords": [

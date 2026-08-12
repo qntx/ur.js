@@ -2,6 +2,10 @@
 
 ## 0.1.0
 
+### Changed
+
+- Package name is `@qntx/ur` (npm name `ur` is already taken by an unrelated package).
+
 ### Added
 
 - Bytes-first Uniform Resources transport aligned with bcur / ur-rs:
