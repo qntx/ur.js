@@ -1,6 +1,6 @@
 {
   "name": "ur",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Uniform Resources (UR) transport for JavaScript/TypeScript — Bytewords, fountain codes, and multi-part UR.",
   "keywords": [
     "blockchain-commons",
@@ -26,7 +26,11 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    },
     "./package.json": "./package.json"
   },
   "publishConfig": {
