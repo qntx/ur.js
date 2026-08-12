@@ -3,6 +3,9 @@
  *
  * Bytes-first transport: Bytewords, fountain codes, and UR encode/decode.
  * Wire-compatible with bcur, ur-rs, and Blockchain Commons references.
+ *
+ * Stable public surface for 0.1.x — do not rely on deep imports of RNG/fountain
+ * helpers unless documented as supported subpath exports.
  */
 
 export { UrError, type UrErrorCode } from "./error.ts";
@@ -23,9 +26,6 @@ export {
   FountainDecoder,
   FountainEncoder,
   Part,
-  chooseFragments,
-  fragmentLength,
-  partition,
 } from "./fountain/index.ts";
 
 export {
@@ -42,5 +42,3 @@ export {
   parseNormalized,
   toQrString,
 } from "./ur/index.ts";
-
-export { Xoshiro256, makeMessage } from "./rng/index.ts";
