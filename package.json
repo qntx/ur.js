@@ -52,7 +52,7 @@
     "bumpp": "^12.2.1",
     "typescript": "^7.0.2",
     "vite": "npm:@voidzero-dev/vite-plus-core@0.2.8",
-    "vite-plus": "^0.2.9"
+    "vite-plus": "^0.3.0"
   },
   "overrides": {
     "vite": "npm:@voidzero-dev/vite-plus-core@0.2.8"
