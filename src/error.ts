@@ -13,12 +13,12 @@ export type UrErrorCode =
   | "InvalidMessageChecksum"
   | "InvalidPartCbor"
   | "DecoderState"
+  | "SinglePartExhausted"
   | "ResourceLimit"
   | "InvalidScheme"
   | "TypeUnspecified"
   | "InvalidType"
   | "InvalidIndices"
-  | "NotMultiPart"
   | "NotSinglePart"
   | "UnexpectedType";
 
@@ -36,12 +36,12 @@ const MESSAGES: Record<UrErrorCode, string> = {
   InvalidMessageChecksum: "invalid fountain message checksum",
   InvalidPartCbor: "invalid fountain part CBOR",
   DecoderState: "fountain decoder internal state error",
+  SinglePartExhausted: "single-part fountain encoder exhausted",
   ResourceLimit: "resource limit exceeded",
   InvalidScheme: "invalid UR scheme",
   TypeUnspecified: "UR type unspecified",
   InvalidType: "invalid UR type",
   InvalidIndices: "invalid multi-part indices",
-  NotMultiPart: "expected multi-part UR",
   NotSinglePart: "expected single-part UR",
   UnexpectedType: "unexpected UR type",
 };

@@ -59,6 +59,7 @@ export class FountainEncoder {
   }
 
   nextPart(): Part {
+    if (this.sequenceCount === 1 && this.currentSequence >= 1) fail("SinglePartExhausted");
     this.currentSequence = nextSequence(this.currentSequence);
     const indexes = chooseFragments(this.currentSequence, this.parts.length, this.messageChecksum);
     const first = this.parts[0]!;

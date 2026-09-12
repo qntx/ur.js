@@ -1,7 +1,26 @@
 import { expect, test } from "vite-plus/test";
 import { UrError } from "../src/error.ts";
 import { makeMessage } from "../src/rng/index.ts";
-import { Decoder, Encoder, UrType, decode, encode, parse, toQrString } from "../src/ur/index.ts";
+import {
+  Decoder,
+  Encoder,
+  UrType,
+  decode,
+  decodeMessage,
+  encode,
+  parse,
+  toQrString,
+} from "../src/ur/index.ts";
+
+function errorOf(fn: () => void): UrError {
+  try {
+    fn();
+  } catch (e) {
+    if (e instanceof UrError) return e;
+    throw e;
+  }
+  throw new Error("expected UrError");
+}
 
 /** CBOR bstr wrapping (major type 2) — matches ur-rs test helper for message URs. */
 function cborBstr(message: Uint8Array): Uint8Array {
@@ -89,9 +108,85 @@ test("custom encoder", () => {
   expect(encoder.nextPart()).toBe("ur:my-scheme/1-2/lpadaobkcywkwmhfwnfeghihjtcxiansvomopr");
 });
 
-test("not multipart", () => {
+test("test_single_part_receive_completes", () => {
   const decoder = new Decoder();
-  expect(() => decoder.receive("ur:bytes/iehsjyhspmwfwfia")).toThrowError(UrError);
+  decoder.receive("ur:bytes/iehsjyhspmwfwfia");
+  expect(decoder.complete).toBe(true);
+  expect(decoder.fragmentCount).toBe(1);
+  expect(decoder.resolvedFragmentCount()).toBe(1);
+  expect(decoder.message()).toEqual(new TextEncoder().encode("data"));
+});
+
+test("Encoder K==1 emits single-part", () => {
+  const data = new TextEncoder().encode("hello");
+  const encoder = Encoder.bytes(data, 64);
+  expect(encoder.isSinglePart).toBe(true);
+  expect(encoder.fragmentCount).toBe(1);
+  const part = encoder.nextPart();
+  expect(part.includes("/1-1/")).toBe(false);
+  expect(part).toBe(encode(data, UrType.bytes()));
+});
+
+test("Encoder K==1 idempotent", () => {
+  const data = new TextEncoder().encode("hello");
+  const encoder = Encoder.bytes(data, 64);
+  expect(encoder.complete).toBe(false);
+  expect(encoder.currentIndex).toBe(0);
+  const first = encoder.nextPart();
+  expect(first).toBe(encode(data, UrType.bytes()));
+  expect(encoder.currentIndex).toBe(1);
+  expect(encoder.isSinglePart).toBe(true);
+  expect(encoder.complete).toBe(true);
+  const second = encoder.nextPart();
+  expect(second).toBe(first);
+  expect(encoder.currentIndex).toBe(1);
+  expect(encoder.complete).toBe(true);
+});
+
+test("mix single then multi", () => {
+  const decoder = new Decoder();
+  decoder.receive(encode(new TextEncoder().encode("data"), UrType.bytes()));
+  const enc = Encoder.bytes(new TextEncoder().encode("Ten chars!".repeat(5)), 5);
+  expect(errorOf(() => decoder.receive(enc.nextPart())).code).toBe("InconsistentPart");
+});
+
+test("mix fountain then single", () => {
+  const decoder = new Decoder();
+  const enc = Encoder.bytes(new TextEncoder().encode("Ten chars!".repeat(5)), 5);
+  decoder.receive(enc.nextPart());
+  expect(errorOf(() => decoder.receive("ur:bytes/iehsjyhspmwfwfia")).code).toBe("InconsistentPart");
+});
+
+test("duplicate single-part ignored", () => {
+  const first = new TextEncoder().encode("data");
+  const second = new TextEncoder().encode("other");
+  const decoder = new Decoder();
+  decoder.receive(encode(first, UrType.bytes()));
+  decoder.receive(encode(second, UrType.bytes()));
+  expect(decoder.message()).toEqual(first);
+});
+
+test("decodeMessage success", () => {
+  expect(decodeMessage(encode(new TextEncoder().encode("data"), UrType.bytes()))).toEqual(
+    new TextEncoder().encode("data"),
+  );
+});
+
+test("test_decode_message_rejects_multipart", () => {
+  const data = new TextEncoder().encode("Ten chars!".repeat(8));
+  const encoder = Encoder.bytes(data, 5);
+  const part = encoder.nextPart();
+  expect(errorOf(() => decodeMessage(part)).code).toBe("NotSinglePart");
+});
+
+test("test_garbage_does_not_pin_type", () => {
+  const data = new TextEncoder().encode("Ten chars!".repeat(6));
+  const encoder = Encoder.create(data, 5, UrType.parse("alpha"));
+  const decoder = new Decoder();
+  expect(() => decoder.receive("ur:beta/1-2/zzzz")).toThrowError(UrError);
+  expect(decoder.type).toBeUndefined();
+  decoder.receive(encoder.nextPart());
+  expect(decoder.type?.value).toBe("alpha");
 });
 
 test("bc-ur example array", () => {

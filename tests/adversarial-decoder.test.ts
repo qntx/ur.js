@@ -2,7 +2,7 @@ import { expect, test } from "vite-plus/test";
 import { UrError } from "../src/error.ts";
 import { FountainDecoder, FountainEncoder, Part } from "../src/fountain/index.ts";
 import { makeMessage } from "../src/rng/index.ts";
-import { Decoder, Encoder, UrType } from "../src/ur/index.ts";
+import { Decoder, Encoder, UrType, encode } from "../src/ur/index.ts";
 
 function codeOf(fn: () => void): string {
   try {
@@ -89,9 +89,20 @@ test("part cbor oversize data is ResourceLimit", () => {
   expect(codeOf(() => Part.fromCbor(cbor, 16))).toBe("ResourceLimit");
 });
 
-test("not multipart on single-part receive", () => {
+test("single-part receive completes", () => {
   const decoder = new Decoder();
-  expect(codeOf(() => decoder.receive("ur:bytes/iehsjyhspmwfwfia"))).toBe("NotMultiPart");
+  decoder.receive("ur:bytes/iehsjyhspmwfwfia");
+  expect(decoder.complete).toBe(true);
+  expect(decoder.message()).toEqual(new TextEncoder().encode("data"));
+});
+
+test("single-part maxMessageLength poisons", () => {
+  const uri = encode(new Uint8Array(8).fill(1), UrType.bytes());
+  const decoder = new Decoder({ limits: { maxMessageLength: 4 } });
+  expect(resourceLimitOf(() => decoder.receive(uri))).toBe("message_length");
+  expect(decoder.isPoisoned).toBe(true);
+  expect(codeOf(() => decoder.receive(uri))).toBe("ResourceLimit");
+  expect(codeOf(() => decoder.message())).toBe("ResourceLimit");
 });
 
 test("fragment_count limit poisons fail-closed", () => {
