@@ -154,3 +154,26 @@ test("buffer_parts duplicate at cap does not poison", () => {
   expect(decoder.receive(mixed)).toBe(false);
   expect(decoder.isPoisoned).toBe(false);
 });
+
+test("test_uri_len_resource_limit_poisons", () => {
+  const data = new TextEncoder().encode("Ten chars!".repeat(5));
+  const enc = Encoder.bytes(data, 5);
+  const part = enc.nextPart();
+  const short = "ur:bytes/iehsjyhspmwfwfia";
+  const decoder = new Decoder({ limits: { maxUriLen: short.length } });
+  expect(part.length).toBeGreaterThan(short.length);
+  expect(resourceLimitOf(() => decoder.receive(part))).toBe("uri_len");
+  expect(decoder.isPoisoned).toBe(true);
+  expect(codeOf(() => decoder.receive(short))).toBe("ResourceLimit");
+  expect(codeOf(() => decoder.message())).toBe("ResourceLimit");
+});
+
+test("UR-layer fragment_data poisons", () => {
+  const encoder = Encoder.bytes(makeMessage("Wolf", 64), 32);
+  const uri = encoder.nextPart();
+  const decoder = new Decoder({ limits: { maxFragmentDataLength: 16 } });
+  expect(resourceLimitOf(() => decoder.receive(uri))).toBe("fragment_data");
+  expect(decoder.isPoisoned).toBe(true);
+  expect(codeOf(() => decoder.receive(uri))).toBe("ResourceLimit");
+  expect(codeOf(() => decoder.message())).toBe("ResourceLimit");
+});

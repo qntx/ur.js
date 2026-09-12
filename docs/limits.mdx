@@ -14,4 +14,6 @@ description: Default DecoderLimits and poison behavior.
 | `maxReceivedParts`      | 8 000     |
 | `maxUriLen`             | 8 192     |
 
-Override with `new Decoder({ limits: { … } })` or `new FountainDecoder({ … })`. Exceeding a limit **poisons** the decoder: later `receive` calls throw `UrError` with code `ResourceLimit`.
+Override with `new Decoder({ limits: { … } })` or `new FountainDecoder({ … })`. Exceeding a limit **poisons** the session: later `receive` and `message` throw `UrError` with code `ResourceLimit`, including `uri_len` on `Decoder`.
+
+`maxUriLen` is compared to `String.length` (UTF-16 code units), not UTF-8 bytes.
