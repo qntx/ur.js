@@ -6,6 +6,8 @@ Uniform Resources (UR) for TypeScript.
 
 Bytewords, fountain codes, and single- or multi-part UR strings. Wire-compatible with [bcur](https://github.com/qntx/bcur).
 
+See [docs/](docs/).
+
 ## License
 
 Licensed under the MIT License ([LICENSE](LICENSE) or <https://opensource.org/licenses/MIT>).

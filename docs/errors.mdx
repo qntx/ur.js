@@ -1,0 +1,8 @@
+---
+title: Errors
+description: UrError codes for the UR transport stack.
+---
+
+Failures throw `UrError` with a stable `code`. Switch on `error.code`, not the message text.
+
+Codes: `InvalidWord`, `InvalidBytewordsChecksum`, `InvalidBytewordsLength`, `NonAscii`, `EmptyMessage`, `EmptyPart`, `InvalidFragmentLen`, `InvalidSequence`, `InconsistentPart`, `InvalidPadding`, `InvalidMessageChecksum`, `InvalidPartCbor`, `DecoderState`, `ResourceLimit`, `InvalidScheme`, `TypeUnspecified`, `InvalidType`, `InvalidIndices`, `NotMultiPart`, `NotSinglePart`, `UnexpectedType`.
