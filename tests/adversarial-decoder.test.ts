@@ -13,6 +13,24 @@ function codeOf(fn: () => void): string {
   }
 }
 
+function resourceLimitOf(fn: () => void): string | undefined {
+  try {
+    fn();
+    return "none";
+  } catch (e) {
+    if (!(e instanceof UrError)) return "other";
+    if (e.code !== "ResourceLimit") return e.code;
+    return e.limit;
+  }
+}
+
+function nextMixedPart(encoder: FountainEncoder): Part {
+  for (;;) {
+    const part = encoder.nextPart();
+    if (!part.isSimple()) return part;
+  }
+}
+
 test("expectedType rejects mismatch", () => {
   const data = new TextEncoder().encode("Ten chars!".repeat(5));
   const enc = Encoder.create(data, 5, UrType.parse("alpha"));
@@ -84,4 +102,55 @@ test("fragment_count limit poisons fail-closed", () => {
   expect(codeOf(() => decoder.receive(encoder.nextPart()))).toBe("ResourceLimit");
   expect(decoder.isPoisoned).toBe(true);
   expect(codeOf(() => decoder.receive(encoder.nextPart()))).toBe("ResourceLimit");
+});
+
+test("message_length limit poisons fail-closed", () => {
+  const decoder = new FountainDecoder({ maxMessageLength: 16 });
+  const encoder = FountainEncoder.create(makeMessage("Wolf", 64), 8);
+  expect(resourceLimitOf(() => decoder.receive(encoder.nextPart()))).toBe("message_length");
+  expect(decoder.isPoisoned).toBe(true);
+  expect(codeOf(() => decoder.receive(encoder.nextPart()))).toBe("ResourceLimit");
+  expect(codeOf(() => decoder.message())).toBe("ResourceLimit");
+});
+
+test("received_parts limit poisons fail-closed", () => {
+  const decoder = new FountainDecoder({ maxReceivedParts: 2 });
+  const encoder = FountainEncoder.create(makeMessage("Wolf", 64), 8);
+  const first = encoder.nextPart();
+  const second = encoder.nextPart();
+  const third = encoder.nextPart();
+  expect(first.sequence).toBe(1);
+  expect(second.sequence).toBe(2);
+  expect(third.sequence).toBe(3);
+  expect(first.isSimple()).toBe(true);
+  expect(second.isSimple()).toBe(true);
+  expect(third.isSimple()).toBe(true);
+  expect(decoder.receive(first)).toBe(true);
+  expect(decoder.receive(second)).toBe(true);
+  expect(resourceLimitOf(() => decoder.receive(third))).toBe("received_parts");
+  expect(decoder.isPoisoned).toBe(true);
+  expect(codeOf(() => decoder.receive(encoder.nextPart()))).toBe("ResourceLimit");
+  expect(codeOf(() => decoder.message())).toBe("ResourceLimit");
+});
+
+test("buffer_parts limit poisons fail-closed", () => {
+  const decoder = new FountainDecoder({ maxBufferParts: 1 });
+  const encoder = FountainEncoder.create(makeMessage("Wolf", 64), 8);
+  const first = nextMixedPart(encoder);
+  const second = nextMixedPart(encoder);
+  expect(first.indexes().join(",")).not.toBe(second.indexes().join(","));
+  expect(decoder.receive(first)).toBe(true);
+  expect(resourceLimitOf(() => decoder.receive(second))).toBe("buffer_parts");
+  expect(decoder.isPoisoned).toBe(true);
+  expect(codeOf(() => decoder.receive(encoder.nextPart()))).toBe("ResourceLimit");
+  expect(codeOf(() => decoder.message())).toBe("ResourceLimit");
+});
+
+test("buffer_parts duplicate at cap does not poison", () => {
+  const decoder = new FountainDecoder({ maxBufferParts: 1 });
+  const encoder = FountainEncoder.create(makeMessage("Wolf", 64), 8);
+  const mixed = nextMixedPart(encoder);
+  expect(decoder.receive(mixed)).toBe(true);
+  expect(decoder.receive(mixed)).toBe(false);
+  expect(decoder.isPoisoned).toBe(false);
 });
