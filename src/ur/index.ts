@@ -6,7 +6,7 @@ import {
   Part,
   mergeLimits,
 } from "../fountain/index.ts";
-import { fail } from "../error.ts";
+import { UrError, fail, failPoison, type DecoderPoison } from "../error.ts";
 import { type Kind, type ParsedUr, normalizeUr, parse, parseNormalized } from "./parse.ts";
 import { UrType } from "./type.ts";
 
@@ -82,18 +82,47 @@ export class Encoder {
 export class Decoder {
   private readonly fountain: FountainDecoder;
   private readonly maxUriLen: number;
+  private readonly maxMessageLength: number;
   private readonly expectedType: UrType | undefined;
   private seenType: UrType | undefined;
+  private poisoned: DecoderPoison | undefined;
 
   constructor(options?: { limits?: Partial<DecoderLimits>; expectedType?: UrType }) {
     const limits = mergeLimits(options?.limits);
     this.fountain = new FountainDecoder(limits);
     this.maxUriLen = limits.maxUriLen;
+    this.maxMessageLength = limits.maxMessageLength;
     this.expectedType = options?.expectedType;
+    void this.maxMessageLength;
+  }
+
+  private poison(limit: string): never {
+    this.poisoned = { code: "ResourceLimit", limit };
+    fail("ResourceLimit", { limit });
+  }
+
+  private escalate(e: unknown): never {
+    if (e instanceof UrError) {
+      if (e.code === "ResourceLimit") {
+        this.poisoned ??= { code: "ResourceLimit", limit: e.limit ?? "unknown" };
+      } else if (e.code === "DecoderState") {
+        this.poisoned ??= { code: "DecoderState" };
+      }
+    }
+    throw e;
+  }
+
+  get poisonState(): DecoderPoison | undefined {
+    return this.poisoned ?? this.fountain.poisonState;
   }
 
   receive(uri: string): void {
-    if (uri.length > this.maxUriLen) fail("ResourceLimit", { limit: "uri_len" });
+    if (this.poisoned) failPoison(this.poisoned);
+    if (this.fountain.isPoisoned) {
+      this.poisoned ??= this.fountain.poisonState!;
+      failPoison(this.poisoned);
+    }
+    if (uri.length > this.maxUriLen) this.poison("uri_len");
 
     const parsed = parse(uri);
     if (parsed.kind !== "multi") fail("NotMultiPart");
@@ -114,14 +143,22 @@ export class Decoder {
       });
     }
 
-    const decoded = bytewords.decode(parsed.body, "minimal");
-    const part = Part.fromCbor(decoded, this.fountain.maxFragmentDataLength);
-    const indices = parsed.indices;
-    if (!indices) fail("InvalidIndices");
-    if (part.sequence !== indices.seq || part.sequenceCount !== indices.count) {
-      fail("InvalidIndices");
+    try {
+      const decoded = bytewords.decode(parsed.body, "minimal");
+      const part = Part.fromCbor(
+        decoded,
+        this.fountain.maxFragmentDataLength,
+        this.fountain.maxFragmentCount,
+      );
+      const indices = parsed.indices;
+      if (!indices) fail("InvalidIndices");
+      if (part.sequence !== indices.seq || part.sequenceCount !== indices.count) {
+        fail("InvalidIndices");
+      }
+      this.fountain.receive(part);
+    } catch (e) {
+      this.escalate(e);
     }
-    this.fountain.receive(part);
   }
 
   get complete(): boolean {
@@ -129,6 +166,8 @@ export class Decoder {
   }
 
   message(): Uint8Array | undefined {
+    if (this.poisoned) failPoison(this.poisoned);
+    if (this.fountain.isPoisoned) failPoison(this.fountain.poisonState!);
     return this.fountain.message();
   }
 
@@ -145,6 +184,6 @@ export class Decoder {
   }
 
   get isPoisoned(): boolean {
-    return this.fountain.isPoisoned;
+    return this.poisoned !== undefined || this.fountain.isPoisoned;
   }
 }
