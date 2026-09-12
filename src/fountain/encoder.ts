@@ -10,6 +10,12 @@ function xorInto(target: Uint8Array, src: Uint8Array): void {
   }
 }
 
+/** Next 1-based fountain seqNum. Does not wrap. */
+export function nextSequence(current: number): number {
+  if (current === 0xffff_ffff) fail("ResourceLimit", { limit: "sequence" });
+  return current + 1;
+}
+
 /** Fountain encoder. */
 export class FountainEncoder {
   private readonly parts: Uint8Array[];
@@ -53,8 +59,7 @@ export class FountainEncoder {
   }
 
   nextPart(): Part {
-    if (this.currentSequence === 0xffff_ffff) fail("ResourceLimit", { limit: "sequence" });
-    this.currentSequence += 1;
+    this.currentSequence = nextSequence(this.currentSequence);
     const indexes = chooseFragments(this.currentSequence, this.parts.length, this.messageChecksum);
     const first = this.parts[0]!;
     const mixed = new Uint8Array(first.length);

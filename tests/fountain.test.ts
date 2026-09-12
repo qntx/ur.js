@@ -7,12 +7,23 @@ import {
   Part,
   chooseFragments,
   fragmentLength,
+  nextSequence,
   partition,
 } from "../src/fountain/index.ts";
 import { makeMessage } from "../src/rng/index.ts";
 
 function hex(bytes: Uint8Array): string {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function errorOf(fn: () => void): UrError {
+  try {
+    fn();
+  } catch (e) {
+    if (e instanceof UrError) return e;
+    throw e;
+  }
+  throw new Error("expected UrError");
 }
 
 test("fragment_length", () => {
@@ -129,4 +140,31 @@ test("resource limit fragment_count poisons", () => {
   expect(() => decoder.receive(encoder.nextPart())).toThrowError(UrError);
   expect(decoder.isPoisoned).toBe(true);
   expect(() => decoder.receive(encoder.nextPart())).toThrowError(UrError);
+});
+
+test("padding wider than one fragment", () => {
+  const decoder = new FountainDecoder();
+  const part = Part.fromFields(1, 2, 1, 0, new Uint8Array(8));
+  const err = errorOf(() => decoder.receive(part));
+  expect(err.code).toBe("InconsistentPart");
+  expect(decoder.isPoisoned).toBe(false);
+  expect(decoder.poisonState).toBeUndefined();
+});
+
+test("Part.fromCbor maxFragmentCount", () => {
+  const part = Part.fromFields(1, 9, 9, 0, new Uint8Array([0xab]));
+  const err = errorOf(() => Part.fromCbor(part.toCbor(), 8192, 8));
+  expect(err.code).toBe("ResourceLimit");
+  expect(err.limit).toBe("fragment_count");
+});
+
+test("Part.fromCbor sequence === 0", () => {
+  const part = Part.fromFields(0, 1, 1, 0, new Uint8Array([0]));
+  expect(errorOf(() => Part.fromCbor(part.toCbor())).code).toBe("InvalidSequence");
+});
+
+test("nextSequence(0xffffffff)", () => {
+  const err = errorOf(() => nextSequence(0xffffffff));
+  expect(err.code).toBe("ResourceLimit");
+  expect(err.limit).toBe("sequence");
 });
