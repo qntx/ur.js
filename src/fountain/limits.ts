@@ -8,7 +8,7 @@ export interface DecoderLimits {
   maxUriLen: number;
 }
 
-/** Provisional defaults (stable mechanism; values experimental until 1.0). */
+/** Production Default; same integers as bcur 1.0. Hosts that need another budget pass `new Decoder({ limits })`. */
 export const DEFAULT_LIMITS: DecoderLimits = {
   maxMessageLength: 1_048_576,
   maxFragmentCount: 2_000,

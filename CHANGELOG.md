@@ -2,12 +2,17 @@
 
 ## Unreleased
 
+## 1.0.0 - 2026-09-12
+
 ### Breaking
 
 - `Encoder.nextPart()` when `fragmentCount === 1` emits a single-part `ur:<type>/<body>` instead of fountain `1-1`.
 - `Decoder.receive` accepts single-part URIs and completes the session.
 - `NotMultiPart` removed.
 - Type is pinned after successful ingest, not on parse.
+- Exceeding `maxUriLen`, UR-layer `Part.fromCbor` `ResourceLimit`, and fountain `DecoderState` poison the session; later `receive` / `message` throw the same code.
+- `Part.fromCbor` caps `sequenceCount` at `maxFragmentCount`.
+- First-part padding wider than one fragment (`product - ml >= fragLen`) is `InconsistentPart`.
 
 ### Added
 
@@ -18,6 +23,12 @@
 ### Changed
 
 - Duplicate single-part of the same type is ignored (first payload wins; body is not compared).
+- `DEFAULT_LIMITS` integers frozen (same as bcur 1.0 Default). Override with `new Decoder({ limits })`.
+
+### Notes
+
+- Public API is transport-only: opaque payload bytes plus a type token. No dCBOR parse, no type registry.
+- ur-rs `Decoder` will not consume K==1 outbound single-part URIs. This `Decoder` still accepts ur-rs fountain `1-1`.
 
 ## 0.1.0
 
