@@ -5,13 +5,13 @@ description: Default DecoderLimits and poison behavior.
 
 `DEFAULT_LIMITS` (mechanism stable; values experimental until 1.0):
 
-| Limit | Default |
-| --- | --- |
-| `maxMessageLength` | 1 048 576 |
-| `maxFragmentCount` | 2 000 |
-| `maxFragmentDataLength` | 8 192 |
-| `maxBufferParts` | 4 000 |
-| `maxReceivedParts` | 8 000 |
-| `maxUriLen` | 8 192 |
+| Limit                   | Default   |
+| ----------------------- | --------- |
+| `maxMessageLength`      | 1 048 576 |
+| `maxFragmentCount`      | 2 000     |
+| `maxFragmentDataLength` | 8 192     |
+| `maxBufferParts`        | 4 000     |
+| `maxReceivedParts`      | 8 000     |
+| `maxUriLen`             | 8 192     |
 
 Override with `new Decoder({ limits: { … } })` or `new FountainDecoder({ … })`. Exceeding a limit **poisons** the decoder: later `receive` calls throw `UrError` with code `ResourceLimit`.
