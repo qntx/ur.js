@@ -46,8 +46,12 @@ export class Part {
     return encodePart(this);
   }
 
-  static fromCbor(bytes: Uint8Array, maxDataLen = DEFAULT_LIMITS.maxFragmentDataLength): Part {
-    return decodePart(bytes, maxDataLen);
+  static fromCbor(
+    bytes: Uint8Array,
+    maxDataLen = DEFAULT_LIMITS.maxFragmentDataLength,
+    maxFragmentCount = DEFAULT_LIMITS.maxFragmentCount,
+  ): Part {
+    return decodePart(bytes, maxDataLen, maxFragmentCount);
   }
 
   sequenceId(): string {

@@ -36,7 +36,7 @@ const MESSAGES: Record<UrErrorCode, string> = {
   InvalidMessageChecksum: "invalid fountain message checksum",
   InvalidPartCbor: "invalid fountain part CBOR",
   DecoderState: "fountain decoder internal state error",
-  ResourceLimit: "decoder resource limit exceeded",
+  ResourceLimit: "resource limit exceeded",
   InvalidScheme: "invalid UR scheme",
   TypeUnspecified: "UR type unspecified",
   InvalidType: "invalid UR type",
@@ -78,4 +78,13 @@ export function fail(
   options?: { expected?: string; found?: string; limit?: string },
 ): never {
   throw new UrError(code, options);
+}
+
+/** Fail-closed decoder poison reason. */
+export type DecoderPoison = { code: "ResourceLimit"; limit: string } | { code: "DecoderState" };
+
+/** Rethrows the stored poison as a {@link UrError}. */
+export function failPoison(p: DecoderPoison): never {
+  if (p.code === "ResourceLimit") fail("ResourceLimit", { limit: p.limit });
+  fail("DecoderState");
 }

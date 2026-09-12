@@ -1,5 +1,5 @@
 import { checksum } from "../crc32.ts";
-import { UrError, fail } from "../error.ts";
+import { UrError, fail, failPoison, type DecoderPoison } from "../error.ts";
 import { type DecoderLimits, mergeLimits } from "./limits.ts";
 import { Part } from "./part.ts";
 
@@ -25,7 +25,7 @@ export class FountainDecoder {
   private messageChecksum = 0;
   private fragmentLength = 0;
   private readonly limits: DecoderLimits;
-  private poisoned: string | undefined;
+  private poisoned: DecoderPoison | undefined;
 
   constructor(limits?: Partial<DecoderLimits>) {
     this.limits = mergeLimits(limits);
@@ -35,13 +35,32 @@ export class FountainDecoder {
     return this.limits.maxFragmentDataLength;
   }
 
+  get maxFragmentCount(): number {
+    return this.limits.maxFragmentCount;
+  }
+
   get isPoisoned(): boolean {
     return this.poisoned !== undefined;
   }
 
-  private poison(reason: string): never {
-    this.poisoned = reason;
-    fail("ResourceLimit", { limit: reason });
+  get poisonState(): DecoderPoison | undefined {
+    return this.poisoned;
+  }
+
+  private poison(limit: string): never {
+    this.poisoned = { code: "ResourceLimit", limit };
+    fail("ResourceLimit", { limit });
+  }
+
+  private escalate(e: unknown): never {
+    if (e instanceof UrError) {
+      if (e.code === "ResourceLimit") {
+        this.poisoned ??= { code: "ResourceLimit", limit: e.limit ?? "unknown" };
+      } else if (e.code === "DecoderState") {
+        this.poisoned ??= { code: "DecoderState" };
+      }
+    }
+    throw e;
   }
 
   /**
@@ -49,9 +68,7 @@ export class FountainDecoder {
    * @returns whether the part was newly ingested.
    */
   receive(part: Part): boolean {
-    if (this.poisoned !== undefined) {
-      fail("ResourceLimit", { limit: this.poisoned });
-    }
+    if (this.poisoned) failPoison(this.poisoned);
     if (this.complete) return false;
 
     if (part.sequenceCount === 0 || part.data.length === 0 || part.messageLength === 0) {
@@ -68,7 +85,10 @@ export class FountainDecoder {
       if (sc > this.limits.maxFragmentCount) this.poison("fragment_count");
       if (ml > this.limits.maxMessageLength) this.poison("message_length");
       const fragLen = part.data.length;
-      if (fragLen * sc < ml) fail("InconsistentPart");
+      const product = fragLen * sc;
+      if (!Number.isSafeInteger(product) || product > 0xffff_ffff) this.poison("message_length");
+      // partition pads with at most fragLen - 1 bytes
+      if (product < ml || product - ml >= fragLen) fail("InconsistentPart");
       this.sequenceCount = sc;
       this.messageLength = ml;
       this.messageChecksum = part.checksum;
@@ -83,9 +103,13 @@ export class FountainDecoder {
     if (this.received.size >= this.limits.maxReceivedParts) this.poison("received_parts");
     this.received.add(key);
 
-    if (part.isSimple()) this.enqueueSimple(part);
-    else this.processComplex(part);
-    this.processQueue();
+    try {
+      if (part.isSimple()) this.enqueueSimple(part);
+      else this.processComplex(part);
+      this.processQueue();
+    } catch (e) {
+      this.escalate(e);
+    }
     return true;
   }
 
@@ -185,9 +209,7 @@ export class FountainDecoder {
 
   /** Decoded message if complete; otherwise `undefined`. */
   message(): Uint8Array | undefined {
-    if (this.poisoned !== undefined) {
-      throw new UrError("ResourceLimit", { limit: this.poisoned });
-    }
+    if (this.poisoned) failPoison(this.poisoned);
     if (!this.complete) return undefined;
     const combined = new Uint8Array(this.fragmentLength * this.sequenceCount);
     for (let idx = 0; idx < this.sequenceCount; idx++) {

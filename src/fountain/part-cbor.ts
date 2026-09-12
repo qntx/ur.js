@@ -13,8 +13,8 @@ export function encodePart(part: Part): Uint8Array {
   return new Uint8Array(out);
 }
 
-/** Decode a part from CBOR with a maximum `data` length. */
-export function decodePart(bytes: Uint8Array, maxDataLen: number): Part {
+/** Decode a part from CBOR with data-length and fragment-count caps. */
+export function decodePart(bytes: Uint8Array, maxDataLen: number, maxFragmentCount: number): Part {
   const cur = { i: 0 };
   if (read(bytes, cur) !== 0x85) fail("InvalidPartCbor");
   const sequence = decodeU32(bytes, cur);
@@ -23,6 +23,9 @@ export function decodePart(bytes: Uint8Array, maxDataLen: number): Part {
   const checksum = decodeU32(bytes, cur);
   const data = decodeBstr(bytes, cur, maxDataLen);
   if (cur.i !== bytes.length) fail("InvalidPartCbor");
+  if (sequence === 0) fail("InvalidSequence");
+  if (sequenceCount === 0 || messageLength === 0 || data.length === 0) fail("EmptyPart");
+  if (sequenceCount > maxFragmentCount) fail("ResourceLimit", { limit: "fragment_count" });
   return Part.fromFields(sequence, sequenceCount, messageLength, checksum, data);
 }
 
