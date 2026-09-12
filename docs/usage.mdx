@@ -1,0 +1,22 @@
+---
+title: Usage
+description: Encode and decode single- and multi-part UR strings.
+---
+
+```ts
+import { encode, decode, Encoder, Decoder, UrType } from "@qntx/ur";
+
+const data = new TextEncoder().encode("hello");
+const ur = encode(data, UrType.bytes());
+const { payload } = decode(ur);
+
+const message = new Uint8Array(200).fill(7);
+const encoder = Encoder.bytes(message, 30);
+const decoder = new Decoder();
+while (!decoder.complete) {
+  decoder.receive(encoder.nextPart());
+}
+const recovered = decoder.message();
+```
+
+`encode` / `decode` are single-part. `Encoder.bytes` / `Decoder` are multi-part (QR animation). `UrType.bytes()` is the `bytes` UR type.

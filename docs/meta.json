@@ -1,0 +1,5 @@
+{
+  "title": "ur.js",
+  "description": "Uniform Resources for TypeScript.",
+  "pages": ["index", "install", "usage", "layers", "limits", "errors"]
+}
