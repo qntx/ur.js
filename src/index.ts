@@ -35,6 +35,7 @@ export {
   type ParsedUr,
   UrType,
   decode,
+  decodeMessage,
   decodeWithType,
   encode,
   normalizeUr,

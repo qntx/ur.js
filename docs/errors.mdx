@@ -5,4 +5,6 @@ description: UrError codes for the UR transport stack.
 
 Failures throw `UrError` with a stable `code`. Switch on `error.code`, not the message text.
 
-Codes: `InvalidWord`, `InvalidBytewordsChecksum`, `InvalidBytewordsLength`, `NonAscii`, `EmptyMessage`, `EmptyPart`, `InvalidFragmentLen`, `InvalidSequence`, `InconsistentPart`, `InvalidPadding`, `InvalidMessageChecksum`, `InvalidPartCbor`, `DecoderState`, `ResourceLimit`, `InvalidScheme`, `TypeUnspecified`, `InvalidType`, `InvalidIndices`, `NotMultiPart`, `NotSinglePart`, `UnexpectedType`.
+Codes: `InvalidWord`, `InvalidBytewordsChecksum`, `InvalidBytewordsLength`, `NonAscii`, `EmptyMessage`, `EmptyPart`, `InvalidFragmentLen`, `InvalidSequence`, `InconsistentPart`, `InvalidPadding`, `InvalidMessageChecksum`, `InvalidPartCbor`, `DecoderState`, `SinglePartExhausted`, `ResourceLimit`, `InvalidScheme`, `TypeUnspecified`, `InvalidType`, `InvalidIndices`, `NotSinglePart`, `UnexpectedType`.
+
+`decodeMessage` throws `NotSinglePart` on a multi-part URI. Duplicate single-part URIs of the same type are not `InconsistentPart`: first payload wins, body not compared. Mixing single-part and fountain in one session is `InconsistentPart`. `SinglePartExhausted` is thrown by a fountain encoder when `K == 1` and `nextPart` is called again.

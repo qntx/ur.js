@@ -8,6 +8,8 @@
 
 import { expect, test } from "vite-plus/test";
 import { makeMessage } from "../src/rng/index.ts";
+import * as bytewords from "../src/bytewords/index.ts";
+import { FountainEncoder } from "../src/fountain/index.ts";
 import { Decoder, Encoder, UrType, decode, encode, toQrString } from "../src/ur/index.ts";
 
 /** CBOR bstr header + payload (ur-rs ByteVec). */
@@ -81,6 +83,19 @@ test("decode full-uppercase multipart URIs", () => {
     decoder.receive(toQrString(encoder.nextPart()));
   }
   expect(decoder.message()).toEqual(data);
+});
+
+test("test_foreign_1_1_fountain_uri_decodes", () => {
+  const message = new TextEncoder().encode("hello");
+  const fountain = FountainEncoder.create(message, 64);
+  expect(fountain.fragmentCount).toBe(1);
+  const part = fountain.nextPart();
+  const body = bytewords.encode(part.toCbor(), "minimal");
+  const uri = `ur:bytes/1-1/${body}`;
+  const decoder = new Decoder();
+  decoder.receive(uri);
+  expect(decoder.complete).toBe(true);
+  expect(decoder.message()).toEqual(message);
 });
 
 test("bc-ur golden: ur:test array", () => {

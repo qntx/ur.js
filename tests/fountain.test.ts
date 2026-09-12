@@ -168,3 +168,10 @@ test("nextSequence(0xffffffff)", () => {
   expect(err.code).toBe("ResourceLimit");
   expect(err.limit).toBe("sequence");
 });
+
+test("FountainEncoder K==1 second nextPart", () => {
+  const encoder = FountainEncoder.create(new TextEncoder().encode("hello"), 64);
+  expect(encoder.fragmentCount).toBe(1);
+  encoder.nextPart();
+  expect(errorOf(() => encoder.nextPart()).code).toBe("SinglePartExhausted");
+});

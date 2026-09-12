@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+### Breaking
+
+- `Encoder.nextPart()` when `fragmentCount === 1` emits a single-part `ur:<type>/<body>` instead of fountain `1-1`.
+- `Decoder.receive` accepts single-part URIs and completes the session.
+- `NotMultiPart` removed.
+- Type is pinned after successful ingest, not on parse.
+
+### Added
+
+- `Encoder.isSinglePart`, `Encoder.complete`
+- `decodeMessage(uri)` — single-part payload or `NotSinglePart`
+- `SinglePartExhausted` — fountain encoder `K == 1` second `nextPart`
+
+### Changed
+
+- Duplicate single-part of the same type is ignored (first payload wins; body is not compared).
+
 ## 0.1.0
 
 ### Changed
