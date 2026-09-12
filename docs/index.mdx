@@ -9,4 +9,4 @@ L1–L3 are a **transport-only** contract: opaque payload bytes plus a type toke
 
 When `fragmentCount === 1`, `Encoder.nextPart` emits a single-part `ur:<type>/<body>`. An ur-rs `Decoder` will not consume that URI. This `Decoder` still accepts ur-rs fountain `1-1`. Fountain goldens match [bcur](https://github.com/qntx/bcur) and ur-rs.
 
-Status: **0.1.0**. The 1.0 contract is this freeze of behavior. Default decoder limit numbers may change before 1.0.
+Status: **1.0.0** transport freeze. `DEFAULT_LIMITS` integers are frozen.

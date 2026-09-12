@@ -1,11 +1,12 @@
 /**
  * Uniform Resources (UR) for JavaScript/TypeScript.
  *
- * Bytes-first transport: Bytewords, fountain codes, and UR encode/decode.
- * Wire-compatible with bcur, ur-rs, and Blockchain Commons references.
+ * 1.0 transport freeze: opaque payload bytes plus a type token.
+ * Bytewords, fountain codes, and UR encode/decode. No dCBOR parse
+ * and no application type registry.
  *
- * Stable public surface for 0.1.x — do not rely on deep imports of RNG/fountain
- * helpers unless documented as supported subpath exports.
+ * Do not rely on deep imports of RNG/fountain helpers unless documented
+ * as supported subpath exports.
  */
 
 export { UrError, failPoison, type DecoderPoison, type UrErrorCode } from "./error.ts";
