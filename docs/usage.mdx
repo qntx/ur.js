@@ -22,4 +22,4 @@ const recovered = decoder.message();
 
 `encode` / `decode` are single-part. `decodeMessage` returns the payload or throws `NotSinglePart` on a fountain URI. `Encoder.nextPart` emits a single-part UR when `fragmentCount === 1`, otherwise fountain `ur:<type>/<seq>-{K}/<body>`. `Decoder.receive` accepts both. Duplicate single-part URIs of the same type are ignored: the body is not compared; the first payload wins. Mixing single-part and fountain in one session is `InconsistentPart`. `UrType.bytes()` is the `bytes` UR type.
 
-Recovered bytes are untrusted. dCBOR and type checks are the caller's job; L3 does not parse application payloads.
+Recovered bytes are untrusted. `encode` / `Encoder` do not parse or require CBOR. BCR-2020-005's "message MUST be dCBOR" is enforced on L4 (`@qntx/ur/typed`): `Ur.fromUrString` and `MultipartDecoder.message` reject non-dCBOR (`CborDecode`).

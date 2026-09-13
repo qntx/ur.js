@@ -36,7 +36,7 @@ cryptography or trust policies.
 | Duplicate single-part different body           | Low                  | First wins, same type; documented                                                                                        |
 | Type confusion across parts                    | Medium               | Type stickiness after successful ingest; `expectedType`                                                                  |
 | Invalid CRC                                    | Low                  | Bytewords CRC + message CRC on fountain join                                                                             |
-| Application payload treated as trusted         | High (host)          | Recovered bytes untrusted; dCBOR/type checks are the host's job                                                          |
+| Application payload treated as trusted         | High (host)          | L4 `CborDecode`/`CborType` for typed hosts; L3 recovered bytes still untrusted                                           |
 
 Hosts scanning untrusted QR streams must keep default limits (or tighter) and
 treat recovered payloads as untrusted input. A poisoned `Decoder` is discarded;

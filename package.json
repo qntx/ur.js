@@ -31,6 +31,11 @@
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
     },
+    "./typed": {
+      "types": "./dist/typed.d.mts",
+      "import": "./dist/typed.mjs",
+      "default": "./dist/typed.mjs"
+    },
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -54,6 +59,14 @@
     "typescript": "^7.0.2",
     "vite": "npm:@voidzero-dev/vite-plus-core@0.2.8",
     "vite-plus": "^0.3.0"
+  },
+  "peerDependencies": {
+    "@blockchaincommons/dcbor": "1.0.0-beta.2"
+  },
+  "peerDependenciesMeta": {
+    "@blockchaincommons/dcbor": {
+      "optional": true
+    }
   },
   "overrides": {
     "vite": "npm:@voidzero-dev/vite-plus-core@0.2.8"
