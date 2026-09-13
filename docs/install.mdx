@@ -11,6 +11,12 @@ bun add @qntx/ur
 npm i @qntx/ur
 ```
 
+Typed L4 (`@qntx/ur/typed`) also needs the optional peer `@blockchaincommons/dcbor@1.0.0-beta.2`:
+
+```bash
+bun add @qntx/ur @blockchaincommons/dcbor@1.0.0-beta.2
+```
+
 Package name is `@qntx/ur`. The GitHub repository is `qntx/ur.js`.
 
-Supported runtimes: Node 20+ and Bun. The published `dist` is ESM and does not import Node builtins; browser is not a 1.0 support claim.
+Supported runtimes: Node 20+ and Bun for the root transport. Typed L4 inherits dcbor's `engines.node` `>=22.12`. The published `dist` is ESM and does not import Node builtins; browser is not a 1.0 support claim.

@@ -5,7 +5,9 @@ description: Uniform Resources transport for TypeScript.
 
 `@qntx/ur` encodes and decodes [Uniform Resources](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2020-005-ur.md) (UR): Bytewords, fountain codes, and single- or multi-part UR strings.
 
-L1–L3 are a **transport-only** contract: opaque payload bytes plus a type token. There is no application type registry, no dCBOR parse, and no tag apply/strip. Type `bytes` is host policy; this codec does not refuse it.
+The **root** `@qntx/ur` is a **transport-only** contract: opaque payload bytes plus a type token. There is no application type registry, no dCBOR parse, and no tag apply/strip. Type `bytes` is host policy; this codec does not refuse it.
+
+L4 lives on `@qntx/ur/typed` and is the first dCBOR parse in this package.
 
 When `fragmentCount === 1`, `Encoder.nextPart` emits a single-part `ur:<type>/<body>`. An ur-rs `Decoder` will not consume that URI. This `Decoder` still accepts ur-rs fountain `1-1`. Fountain goldens match [bcur](https://github.com/qntx/bcur) and ur-rs.
 
