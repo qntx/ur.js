@@ -43,7 +43,7 @@ export class Ur {
 
   static create(type: UrType | string, input: CborInput): Ur {
     // copy: caller mutation must not change the stored bstr
-    const prepared = input instanceof Uint8Array ? input.slice() : input;
+    const prepared = input instanceof Uint8Array ? new Uint8Array(input) : input;
     return new Ur(
       parseType(type),
       mapCborType(() => cbor(prepared)),
@@ -53,7 +53,7 @@ export class Ur {
   /** Wrap already-encoded dCBOR bytes. Used by fromUrString. */
   static fromCborData(type: UrType | string, data: Uint8Array): Ur {
     // copy: caller mutation must not change the stored bstr
-    const bytes = data.slice();
+    const bytes = new Uint8Array(data);
     const value = mapCborDecode(() => decodeCbor(bytes));
     return new Ur(parseType(type), value);
   }

@@ -3,10 +3,7 @@ import { fail } from "../error.ts";
 import { UrType } from "../ur/type.ts";
 import { Ur, mapCborType } from "./ur.ts";
 
-/**
- * TS witness for bcur UrEncodable/UrDecodable.
- * dcbor has no CBORTaggedEncodable; do not pretend it does.
- */
+/** First `tags[0].name` is the UR type; body is untagged. */
 export interface UrCodec<T> {
   /** Most-preferred first. First tag.name is the UR type token. */
   readonly tags: readonly Tag[];
