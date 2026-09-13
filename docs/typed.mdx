@@ -16,7 +16,7 @@ ur.string(); // "ur:test/lsadaoaxjygonesw"
 const again = Ur.fromUrString(ur.string());
 ```
 
-`Ur.create` maps a JS value through dCBOR. The UR body is untagged. Application codecs use `UrCodec<T>`: first `tags[0].name` is the UR type token; `untaggedCbor` / `fromUntaggedCbor` are the body.
+`Ur.create` maps a JS value through dCBOR. The UR body is untagged. Application codecs use `UrCodec`: first `tags[0].name` is the UR type token; `untaggedCbor` / `fromUntaggedCbor` are the body.
 
 ```ts
 import { toUr, fromUr, type UrCodec } from "@qntx/ur/typed";
