@@ -11,4 +11,4 @@ L4 lives on `@qntx/ur/typed` and is the first dCBOR parse in this package.
 
 When `fragmentCount === 1`, `Encoder.nextPart` emits a single-part `ur:<type>/<body>`. An ur-rs `Decoder` will not consume that URI. This `Decoder` still accepts ur-rs fountain `1-1`. Fountain goldens match [bcur](https://github.com/qntx/bcur) and ur-rs.
 
-Status: **1.0.0** transport freeze. `DEFAULT_LIMITS` integers are frozen.
+Status: **1.0.0** transport freeze on the root; **1.1.0** adds `@qntx/ur/typed`. `DEFAULT_LIMITS` integers are frozen. Runtime: Node `>=22.12`.

@@ -4,14 +4,22 @@
 
 ## 1.1.0 - 2026-09-13
 
+### Breaking
+
+- `engines.node` is `>=22.12`, matching `@blockchaincommons/dcbor`. Node 20 is not a supported runtime.
+
 ### Added
 
 - L4 `@qntx/ur/typed`: `Ur` value, `UrCodec`, and typed `MultipartEncoder` / `MultipartDecoder`. Dual-entry pack; dcbor stays external. Root `@qntx/ur` does not import dcbor.
 - `CborDecode` / `CborType` error codes (L4-only; exhaustive `switch (error.code)` needs a default).
 
+### Fixed
+
+- Pin `devEngines.packageManager` to bun `1.3.14` with `onFail: ignore`. Tag-triggered `publish-npm.yml@v2` still runs `npm publish` on Node 24; npm 11 treats `onFail: download` plus `name: bun` as `EBADDEVENGINES`. Vite+ rewrites an absent field to `onFail: download`. CI `npm publish --dry-run` on Node 24 guards this.
+
 ### Notes
 
-- Optional peer `@blockchaincommons/dcbor@1.0.0-beta.2`. Accepted upstream beta warning.
+- Optional peer `@blockchaincommons/dcbor@1.0.0-beta.2`. Upstream has no stable `1.0.0`; pin stays on `beta.2`.
 
 ## 1.0.0 - 2026-09-12
 

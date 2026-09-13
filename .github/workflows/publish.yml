@@ -17,3 +17,4 @@ jobs:
     with:
       package-manager: bun
       bun-version: "1.3.14"
+      node-version: "24"
