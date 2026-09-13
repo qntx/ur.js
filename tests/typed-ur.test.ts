@@ -1,4 +1,4 @@
-import { cbor, cborEquals } from "@blockchaincommons/dcbor";
+import { CborError, cbor, cborEquals, taggedValue } from "@blockchaincommons/dcbor";
 import { expect, test } from "vite-plus/test";
 import { Encoder, encode } from "../src/ur/index.ts";
 import { Ur, UrError, UrType } from "../src/typed/index.ts";
@@ -24,7 +24,9 @@ test("dCBOR array golden roundtrip", () => {
 
 test("L4 rejects L3 UTF-8 hello", () => {
   const hello = encode(new TextEncoder().encode("hello"), UrType.bytes());
-  expect(errorOf(() => Ur.fromUrString(hello)).code).toBe("CborDecode");
+  const err = errorOf(() => Ur.fromUrString(hello));
+  expect(err.code).toBe("CborDecode");
+  expect(CborError.isCborError(err.cause)).toBe(true);
 });
 
 test("empty L3 payload is CborDecode", () => {
@@ -57,10 +59,26 @@ test("empty or illegal type on Ur.create is InvalidType", () => {
 });
 
 test("encode-side cbor failure is CborType", () => {
-  const tagged = errorOf(() => Ur.create("test", { tag: 1, value: 2 }));
-  expect(tagged).toBeInstanceOf(UrError);
-  expect(tagged.code).toBe("CborType");
+  const ambiguous = errorOf(() => Ur.create("test", { tag: 1, value: 2 }));
+  expect(ambiguous).toBeInstanceOf(UrError);
+  expect(ambiguous.code).toBe("CborType");
+  expect(CborError.isCborError(ambiguous.cause)).toBe(true);
   const range = errorOf(() => Ur.create("test", 1n << 64n));
   expect(range).toBeInstanceOf(UrError);
   expect(range.code).toBe("CborType");
+  expect(CborError.isCborError(range.cause)).toBe(true);
+});
+
+test("Ur.create accepts tagged Cbor", () => {
+  const created = Ur.create("test", taggedValue(1, 2));
+  expect(cborEquals(created.cbor, taggedValue(1, 2))).toBe(true);
+  const decoded = Ur.fromUrString(created.string());
+  expect(cborEquals(created.cbor, decoded.cbor)).toBe(true);
+});
+
+test("Ur.create copies top-level Uint8Array", () => {
+  const buf = Uint8Array.from([1, 2, 3]);
+  const ur = Ur.create("test", buf);
+  buf[0] = 99;
+  expect(cborEquals(ur.cbor, cbor(Uint8Array.from([1, 2, 3])))).toBe(true);
 });
