@@ -82,3 +82,10 @@ test("Ur.create copies top-level Uint8Array", () => {
   buf[0] = 99;
   expect(cborEquals(ur.cbor, cbor(Uint8Array.from([1, 2, 3])))).toBe(true);
 });
+
+test("Ur.create copies top-level Buffer", () => {
+  const buf = Buffer.from([1, 2, 3]);
+  const ur = Ur.create("test", buf);
+  buf[0] = 99;
+  expect(cborEquals(ur.cbor, cbor(Uint8Array.from([1, 2, 3])))).toBe(true);
+});

@@ -64,9 +64,8 @@ jobs:
           }
           JS
           node --input-type=module <<'JS'
-          import { readFileSync } from "node:fs";
+          import { readdirSync, readFileSync } from "node:fs";
           const typed = readFileSync("./dist/typed.mjs", "utf8");
-          const index = readFileSync("./dist/index.mjs", "utf8");
           if (!typed.includes("@blockchaincommons/dcbor")) {
             throw new Error("typed.mjs must import @blockchaincommons/dcbor");
           }
@@ -76,8 +75,12 @@ jobs:
           if (typed.includes("function decodeCbor") || typed.includes("CborError.underrun")) {
             throw new Error("typed.mjs inlined dcbor source");
           }
-          if (index.includes("@blockchaincommons/dcbor")) {
-            throw new Error("index.mjs must not import @blockchaincommons/dcbor");
+          for (const name of readdirSync("./dist").filter((n) => n.endsWith(".mjs"))) {
+            if (name === "typed.mjs") continue;
+            const body = readFileSync(`./dist/${name}`, "utf8");
+            if (body.includes("@blockchaincommons/dcbor")) {
+              throw new Error(`${name} must not import @blockchaincommons/dcbor`);
+            }
           }
           const pkg = JSON.parse(readFileSync("./package.json", "utf8"));
           for (const key of [".", "./typed"]) {
