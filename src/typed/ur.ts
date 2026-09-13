@@ -42,7 +42,7 @@ export class Ur {
   }
 
   static create(type: UrType | string, input: CborInput): Ur {
-    // top-level bstr: cbor(Uint8Array) aliases the buffer (dcbor src/cbor.ts)
+    // copy: caller mutation must not change the stored bstr
     const prepared = input instanceof Uint8Array ? input.slice() : input;
     return new Ur(
       parseType(type),
@@ -50,9 +50,9 @@ export class Ur {
     );
   }
 
-  /** Wrap already-encoded dCBOR bytes. Used by fromUrString and MultipartDecoder. */
+  /** Wrap already-encoded dCBOR bytes. Used by fromUrString. */
   static fromCborData(type: UrType | string, data: Uint8Array): Ur {
-    // slice: decodeCbor bstrs alias the input buffer
+    // copy: caller mutation must not change the stored bstr
     const bytes = data.slice();
     const value = mapCborDecode(() => decodeCbor(bytes));
     return new Ur(parseType(type), value);
