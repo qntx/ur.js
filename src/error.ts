@@ -20,7 +20,9 @@ export type UrErrorCode =
   | "InvalidType"
   | "InvalidIndices"
   | "NotSinglePart"
-  | "UnexpectedType";
+  | "UnexpectedType"
+  | "CborDecode"
+  | "CborType";
 
 const MESSAGES: Record<UrErrorCode, string> = {
   InvalidWord: "invalid bytewords word",
@@ -44,6 +46,8 @@ const MESSAGES: Record<UrErrorCode, string> = {
   InvalidIndices: "invalid multi-part indices",
   NotSinglePart: "expected single-part UR",
   UnexpectedType: "unexpected UR type",
+  CborDecode: "dCBOR decode failed",
+  CborType: "dCBOR type mismatch",
 };
 
 /** Structured error thrown by the UR stack. */
@@ -75,7 +79,7 @@ export class UrError extends Error {
 /** Throws a {@link UrError} with the given code. */
 export function fail(
   code: UrErrorCode,
-  options?: { expected?: string; found?: string; limit?: string },
+  options?: { expected?: string; found?: string; limit?: string; cause?: unknown },
 ): never {
   throw new UrError(code, options);
 }

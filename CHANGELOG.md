@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- L4 `Ur` value and `CborDecode`/`CborType` error codes. `@blockchaincommons/dcbor` is a devDependency only.
+
 ## 1.0.0 - 2026-09-12
 
 ### Breaking
