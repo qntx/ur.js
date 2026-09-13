@@ -2,9 +2,16 @@
 
 ## Unreleased
 
-- L4 `Ur` value, `UrCodec`, and typed `MultipartEncoder` / `MultipartDecoder`.
-- `CborDecode` / `CborType` error codes (typed layer only; exhaustive `switch (error.code)` needs a default).
-- Export `@qntx/ur/typed`. Optional peer `@blockchaincommons/dcbor@1.0.0-beta.2`. Dual-entry pack; dcbor stays external. Root `@qntx/ur` does not import dcbor.
+## 1.1.0 - 2026-09-13
+
+### Added
+
+- L4 `@qntx/ur/typed`: `Ur` value, `UrCodec`, and typed `MultipartEncoder` / `MultipartDecoder`. Dual-entry pack; dcbor stays external. Root `@qntx/ur` does not import dcbor.
+- `CborDecode` / `CborType` error codes (L4-only; exhaustive `switch (error.code)` needs a default).
+
+### Notes
+
+- Optional peer `@blockchaincommons/dcbor@1.0.0-beta.2`. Accepted upstream beta warning.
 
 ## 1.0.0 - 2026-09-12
 
