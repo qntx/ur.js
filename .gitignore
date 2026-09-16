@@ -1,7 +1,14 @@
 node_modules
 dist
+*.local
 *.log
 .DS_Store
-!.vscode/
+.env
+.env.*
+.vite-hooks/_
+.wrangler
+.dev.vars*
+.idea
+.vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json

@@ -8,7 +8,8 @@
 
 ### Changed
 
-- Drop the CI `node` matrix job and `scripts/ci-node-*.mjs`. Bun `ci-bun.yml@v2` remains.
+- Drop the CI `node` matrix job and `scripts/ci-node-*.mjs`.
+- Convert the repo to a vite-plus bun workspace. `@qntx/ur` lives at `packages/ur`. CI is `bun run ready`. Version stays 1.1.0.
 - Fountain `seqNum` fail-closed at `0xffffffff` (`ResourceLimit` `limit: "sequence"`) is the documented contract; wrap-to-0 is rejected.
 
 ## 1.1.0 - 2026-09-13
