@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 1.5.0 - 2026-09-16
+
+### Added
+
+- L5 `envelopeCodec`, `assertEnvelopeContent`, `ENVELOPE_MAX_DEPTH`. Validating identity over untagged envelope-content. Depths 0..=64 accepted; 65 is `OutOfRange`. No elide/encrypt/digest-sort.
+
 ## 1.4.0 - 2026-09-16
 
 ### Added

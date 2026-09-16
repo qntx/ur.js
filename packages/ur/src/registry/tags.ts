@@ -15,6 +15,7 @@ export const TAG_COMPRESSED = 40_003;
 
 /** Codecs that exist in this version. Number constants for later tags live above. */
 export const TAGS = {
+  envelope: Tag.from(TAG_ENVELOPE, "envelope"),
   seed: Tag.from(TAG_SEED, "seed"),
   hdkey: Tag.from(TAG_HDKEY, "hdkey"),
   keypath: Tag.from(TAG_KEYPATH, "keypath"),

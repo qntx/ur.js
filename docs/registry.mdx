@@ -3,7 +3,7 @@ title: Registry
 description: L5 v2 UR application types on @qntx/ur/registry.
 ---
 
-`@qntx/ur/registry` is L5: `UrCodec` implementations for BCR-2020-006 v2 types. This version ships `seed` (40300), `hdkey` / `keypath` / `coin-info` (40303–40305), `sskr` (40309), and `psbt` (40310). Hosts pass a codec into L4 `toUr` / `fromUr`.
+`@qntx/ur/registry` is L5: `UrCodec` implementations for BCR-2020-006 v2 types. This version ships `seed` (40300), `hdkey` / `keypath` / `coin-info` (40303–40305), `sskr` (40309), `psbt` (40310), and `envelope` (200). Hosts pass a codec into L4 `toUr` / `fromUr`.
 
 Requires the optional peer `@blockchaincommons/dcbor@1.0.0-beta.2`. Importing `@qntx/ur/registry` without the peer fails at load. Transport-only hosts that import only `@qntx/ur` may omit it.
 
@@ -45,5 +45,7 @@ Every `Uint8Array` is copied on encode and decode. Mutating a caller buffer afte
 Closed CDDL maps: unknown keys are `CborType`. Codecs throw `CborError`; `toUr` / `fromUr` map those to `UrError` with `code: "CborType"`.
 
 SSKR is a 5-byte header plus share-value bstr. Domain thresholds are N (1..=16); the wire stores N-1. Reserved nibble must be 0. This codec does not split or combine shares.
+
+`envelopeCodec` is a validating identity over untagged envelope-content. `assertEnvelopeContent` walks the CASE; depths 0..=64 are accepted (65 frames). It does not elide, encrypt, or sort assertions.
 
 This export does not derive BIP32 keys, sign or finalize PSBTs, split SSKR, or elide Envelope.

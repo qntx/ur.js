@@ -51,6 +51,16 @@ export const hdkey2 = {
   digestHex: "362af3038da7600ad1581c19161c8594aafafc24e5acf1aefc8f7a0bbe366df2",
 } as const;
 
+export const envelopeAlice = {
+  cborHex: "d8c965416c696365",
+  wrappedCborHex: "d8c8d8c965416c696365",
+} as const;
+
+export const envelopeNode = {
+  cborHex: "82d8c965416c696365a1d8c9656b6e6f7773d8c963426f62",
+  ur: "ur:envelope/lftpsoihfpjziniaihoytpsoihjejtjlktjktpsoiafwjlidutgmnnns",
+} as const;
+
 /** BCR-2020-011 third share. identifier 0x4bbf, GT=2, G=2, GI=0, T=2, reserved=0, I=2. */
 export const sskrShare = {
   identifier: 0x4bbf,

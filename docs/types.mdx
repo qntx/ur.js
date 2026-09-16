@@ -13,12 +13,13 @@ L5 codecs use v2 type tokens. The first `codec.tags[0].name` is the UR type. v1 
 | `coin-info` | 40305 | `coinInfoCodec` | `type` uint31 and `network` int. Omit 0 on write (BTC mainnet).                              |
 | `sskr`      | 40309 | `sskrCodec`     | 5-byte header ‖ share-value. Domain stores N not N-1. Reserved nibble 0. No split/combine.   |
 | `psbt`      | 40310 | `psbtCodec`     | Untagged bstr. Magic `70736274ff`. No input/output parse.                                    |
+| `envelope`  | 200   | `envelopeCodec` | Untagged envelope-content. Identity after `assertEnvelopeContent`. Depths 0..=64. No elide.  |
 
 `hdKeyCodec` does not check BIP44 cointype against the origin path and does not check parent-fingerprint isomorphism. Official HDKey vector 2 (`use-info` `{2: 1}` with path `44'/1'/1'/0/1`) is the lock. Nested embeddings are tagged; the `ur:hdkey` body is not.
 
 `hdKeyDigestSource` is dCBOR `[keyData, chainCode or null, coinType, network]`. Master uses `0, 0`. Derived fills `useInfo` defaults with 0. Vector 2 uses `network = 1` even though the BCR comment says mainnet.
 
-Later minors add `envelope` (200). That codec is not in 1.4.0.
+`envelopeCodec` does not elide, encrypt, or sort assertions by digest. Nested wrap is tag 200; the `ur:envelope` body is untagged.
 
 | Not decoded    | Tag |
 | -------------- | --- |
