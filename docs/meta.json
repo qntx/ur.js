@@ -1,5 +1,16 @@
 {
   "title": "ur.js",
   "description": "Uniform Resources for TypeScript.",
-  "pages": ["index", "install", "usage", "layers", "typed", "limits", "errors"]
+  "pages": [
+    "index",
+    "install",
+    "usage",
+    "layers",
+    "typed",
+    "registry",
+    "types",
+    "envelope",
+    "limits",
+    "errors"
+  ]
 }

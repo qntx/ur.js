@@ -1,0 +1,97 @@
+:root {
+  color-scheme: light dark;
+  font:
+    16px/1.45 ui-sans-serif,
+    system-ui,
+    sans-serif;
+  color: CanvasText;
+  background: Canvas;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.lede {
+  color: GrayText;
+}
+
+section {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid GrayText;
+}
+
+label,
+button {
+  display: block;
+  margin: 0.75rem 0 0.35rem;
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  font:
+    0.85rem/1.4 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  padding: 0.5rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.row button,
+section form button[type="submit"] {
+  margin-top: 0.5rem;
+}
+
+pre {
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font:
+    0.8rem/1.35 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+
+.parts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.parts li,
+.result {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}
+
+.qr {
+  margin: 0;
+}
+
+.qr figcaption {
+  font-size: 0.85rem;
+  color: GrayText;
+}
+
+.error {
+  color: #b00020;
+}

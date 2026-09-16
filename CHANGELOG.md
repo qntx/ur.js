@@ -2,13 +2,41 @@
 
 ## Unreleased
 
+## 1.6.0 - 2026-09-16
+
 ### Added
 
+- L5 `codecMap` / `fromUrStringWith`. Host-provided dispatch. Duplicate `tags[0].name` is `TypeError`. Unknown type is `UnexpectedType`. No global registry.
+
+## 1.5.0 - 2026-09-16
+
+### Added
+
+- L5 `envelopeCodec`, `assertEnvelopeContent`, `ENVELOPE_MAX_DEPTH`. Validating identity over untagged envelope-content. Depths 0..=64 accepted; 65 is `OutOfRange`. No elide/encrypt/digest-sort.
+
+## 1.4.0 - 2026-09-16
+
+### Added
+
+- L5 `sskrCodec`. Packed 5-byte header; domain stores N not N-1. Official BCR-2020-011 third share golden.
+
+## 1.3.0 - 2026-09-16
+
+### Added
+
+- L5 `hdKeyCodec`, `keypathCodec`, `coinInfoCodec`, `hdKeyDigestSource`, `hdKeyDigest`. Nested tags 40304/40305. Official HDKey vectors 1–2.
+
+## 1.2.0 - 2026-09-16
+
+### Added
+
+- L5 `@qntx/ur/registry`: `seedCodec`, `psbtCodec`, `seedDigest`. Triple pack entry. Optional dcbor peer. v2 type tokens only.
 - Vendored `tests/vectors/` contract goldens, byte-identical to bcur `crates/bcur/tests/vectors/contract/`.
 
 ### Changed
 
-- Drop the CI `node` matrix job and `scripts/ci-node-*.mjs`. Bun `ci-bun.yml@v2` remains.
+- Drop the CI `node` matrix job and `scripts/ci-node-*.mjs`.
+- Convert the repo to a vite-plus bun workspace. `@qntx/ur` lives at `packages/ur`. CI is `bun run ready`.
 - Fountain `seqNum` fail-closed at `0xffffffff` (`ResourceLimit` `limit: "sequence"`) is the documented contract; wrap-to-0 is rejected.
 
 ## 1.1.0 - 2026-09-13

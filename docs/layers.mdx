@@ -3,12 +3,13 @@ title: Layers
 description: Bytewords, fountain codes, and UR.
 ---
 
-| Layer | Module           | Spec                                                                                                       |
-| ----- | ---------------- | ---------------------------------------------------------------------------------------------------------- |
-| L1    | `bytewords`      | [BCR-2020-012](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2020-012-bytewords.md) |
-| L2    | `fountain`       | BCR-2024-001 MUR                                                                                           |
-| L3    | `ur`             | [BCR-2020-005](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2020-005-ur.md)        |
-| L4    | `@qntx/ur/typed` | BCR-2020-005 MUST-dCBOR; first tag name is the UR type token                                               |
+| Layer | Module              | Spec                                                                                                       |
+| ----- | ------------------- | ---------------------------------------------------------------------------------------------------------- |
+| L1    | `bytewords`         | [BCR-2020-012](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2020-012-bytewords.md) |
+| L2    | `fountain`          | BCR-2024-001 MUR                                                                                           |
+| L3    | `ur`                | [BCR-2020-005](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2020-005-ur.md)        |
+| L4    | `@qntx/ur/typed`    | BCR-2020-005 MUST-dCBOR; first tag name is the UR type token                                               |
+| L5    | `@qntx/ur/registry` | BCR-2020-006 v2 types; UrCodec for seed/hdkey/keypath/coin-info/sskr/psbt/envelope                         |
 
 The public entry re-exports `bytewords`, `FountainEncoder` / `FountainDecoder`, and `encode` / `decode` / `Encoder` / `Decoder`. Deep imports of RNG helpers are not a supported subpath.
 

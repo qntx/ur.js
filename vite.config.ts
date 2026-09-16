@@ -1,39 +1,18 @@
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
-  pack: {
-    dts: {
-      tsgo: true,
-    },
-    // ESM-only sugar flattens to a string; keep types/import/default for both entries.
-    exports: {
-      customExports(exports) {
-        for (const [key, value] of Object.entries(exports)) {
-          if (typeof value === "string" && value.endsWith(".mjs")) {
-            exports[key] = {
-              types: value.replace(/\.mjs$/, ".d.mts"),
-              import: value,
-              default: value,
-            };
-          }
-        }
-        return exports;
-      },
-    },
-    entry: {
-      index: "src/index.ts",
-      typed: "src/typed/index.ts",
-    },
-    // optional peer is not auto-externalized
-    deps: {
-      neverBundle: ["@blockchaincommons/dcbor"],
-    },
+  defaultPackage: {
+    dev: "./apps/website",
+    build: "./apps/website",
+    preview: "./apps/website",
+    pack: "./packages/ur",
   },
-  lint: {
-    options: {
-      typeAware: true,
-      typeCheck: true,
-    },
-  },
+  staged: { "*": "vp check --fix" },
   fmt: {},
+  lint: {
+    jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
+    rules: { "vite-plus/prefer-vite-plus-imports": "error" },
+    options: { typeAware: true, typeCheck: true },
+  },
+  run: { cache: !process.env.CI },
 });

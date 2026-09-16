@@ -10,3 +10,5 @@ Codes: `InvalidWord`, `InvalidBytewordsChecksum`, `InvalidBytewordsLength`, `Non
 `decodeMessage` throws `NotSinglePart` on a multi-part URI. Duplicate single-part URIs of the same type are not `InconsistentPart`: first payload wins, body not compared. Mixing single-part and fountain in one session is `InconsistentPart`. `SinglePartExhausted` is thrown by a fountain encoder when `K == 1` and `nextPart` is called again.
 
 `CborDecode` / `CborType` are thrown only by `@qntx/ur/typed`. L1–L3 still throw the 1.0 codes. Exhaustive `switch (error.code)` needs a default. `e instanceof UrError` holds when `UrError` is imported from `@qntx/ur` and thrown from `@qntx/ur/typed`.
+
+`InvalidType` is a type token that fails `[a-z0-9-]+`. Duplicate `codecMap` entries throw `TypeError`, not `InvalidType`. `fromUrStringWith` on an unknown type is `UnexpectedType`; `expected` is the map keys joined with `|`.
