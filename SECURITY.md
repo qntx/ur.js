@@ -12,7 +12,7 @@
 
 Report security issues privately via GitHub Security Advisories on
 [qntx/ur.js](https://github.com/qntx/ur.js/security/advisories/new), or email
-`security@qntx.fun` if that channel is unavailable.
+`security@qntx.org` if that channel is unavailable.
 
 Please include:
 
