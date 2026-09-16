@@ -23,6 +23,7 @@ const dist = (name: string) => pathToFileURL(resolve(root, "dist", name)).href;
 test("package exports resolve to packed files, not source", () => {
   expect(exportTarget(pkg.exports["."])).toBe("./dist/index.mjs");
   expect(exportTarget(pkg.exports["./typed"])).toBe("./dist/typed.mjs");
+  expect(exportTarget(pkg.exports["./registry"])).toBe("./dist/registry.mjs");
   expect(pkg.publishConfig?.exports).toBeUndefined();
 });
 
@@ -31,8 +32,32 @@ test("packed index.mjs does not mention dcbor", () => {
   expect(src.includes("@blockchaincommons/dcbor")).toBe(false);
 });
 
+test("packed registry.mjs imports dcbor as external", () => {
+  const registry = readFileSync(resolve(root, "dist/registry.mjs"), "utf8");
+  expect(registry.includes("@blockchaincommons/dcbor")).toBe(true);
+  expect(/from\s*["']@blockchaincommons\/dcbor["']/.test(registry)).toBe(true);
+});
+
 test("packed UrError is one class across entries", async () => {
   const index = (await import(dist("index.mjs"))) as { UrError: unknown };
   const typed = (await import(dist("typed.mjs"))) as { UrError: unknown };
+  const registry = (await import(dist("registry.mjs"))) as {
+    UrError: unknown;
+    seedCodec: unknown;
+    psbtCodec: unknown;
+    seedDigest: unknown;
+    codecMap?: unknown;
+    hdKeyCodec?: unknown;
+    sskrCodec?: unknown;
+    envelopeCodec?: unknown;
+  };
   expect(index.UrError).toBe(typed.UrError);
+  expect(index.UrError).toBe(registry.UrError);
+  expect(registry.seedCodec).toBeDefined();
+  expect(registry.psbtCodec).toBeDefined();
+  expect(registry.seedDigest).toBeDefined();
+  expect(registry.codecMap).toBeUndefined();
+  expect(registry.hdKeyCodec).toBeUndefined();
+  expect(registry.sskrCodec).toBeUndefined();
+  expect(registry.envelopeCodec).toBeUndefined();
 });

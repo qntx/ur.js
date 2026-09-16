@@ -5,7 +5,7 @@ export default defineConfig({
     dts: {
       tsgo: true,
     },
-    // ESM-only sugar flattens to a string; keep types/import/default for both entries.
+    // ESM-only sugar flattens to a string; keep types/import/default for pack entries.
     exports: {
       customExports(exports) {
         for (const [key, value] of Object.entries(exports)) {
@@ -23,6 +23,7 @@ export default defineConfig({
     entry: {
       index: "src/index.ts",
       typed: "src/typed/index.ts",
+      registry: "src/registry/index.ts",
     },
     // optional peer is not auto-externalized
     deps: {

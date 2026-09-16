@@ -1,0 +1,47 @@
+---
+title: Registry
+description: L5 v2 UR application types on @qntx/ur/registry.
+---
+
+`@qntx/ur/registry` is L5: `UrCodec` implementations for BCR-2020-006 v2 types. This version ships `seed` (tag 40300) and `psbt` (tag 40310). Hosts pass a codec into L4 `toUr` / `fromUr`.
+
+Requires the optional peer `@blockchaincommons/dcbor@1.0.0-beta.2`. Importing `@qntx/ur/registry` without the peer fails at load. Transport-only hosts that import only `@qntx/ur` may omit it.
+
+v1 `crypto-seed` / `crypto-psbt` and tags 300–311 are not decoded.
+
+```ts
+import {
+  seedCodec,
+  psbtCodec,
+  toUrString,
+  fromUrString,
+  toUr,
+  fromUr,
+  MultipartEncoder,
+  MultipartDecoder,
+  UrType,
+  type Seed,
+  type Psbt,
+} from "@qntx/ur/registry";
+
+const seed: Seed = { payload: entropy };
+const seedUri = toUrString(seed, seedCodec); // ur:seed/...
+
+const ur = toUr({ bytes: psbtBin }, psbtCodec);
+const enc = MultipartEncoder.create(ur, 50);
+const dec = new MultipartDecoder({ expectedType: UrType.parse("psbt") });
+while (!dec.complete) dec.receive(enc.nextPart());
+const recovered: Psbt = fromUr(dec.message()!, psbtCodec);
+```
+
+The UR body is untagged dCBOR. Nested embeddings (later hdkey fields) are tagged; the top-level UR body is not.
+
+Seed `creation-date` is BCR-2023-008 tag 1 (`CborDate`) only. The historical BCR-2020-006 example with tag 100 is rejected (`CborType`).
+
+Every `Uint8Array` is copied on encode and decode. Mutating a caller buffer after `toUr` / `fromUr` does not change the UR or the decoded object.
+
+`seedDigest(seed)` is SHA-256 of the raw payload bytes (BCR-2021-002), not of the CBOR map.
+
+Closed CDDL maps: unknown keys are `CborType`. Codecs throw `CborError`; `toUr` / `fromUr` map those to `UrError` with `code: "CborType"`.
+
+This export does not derive BIP32 keys, sign or finalize PSBTs, split SSKR, or elide Envelope.
