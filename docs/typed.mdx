@@ -34,6 +34,6 @@ fromUr(ur, noteCodec);
 
 `MultipartEncoder.create(ur, maxFragmentLength)` encodes dCBOR **once**, then uses L3 `Encoder`. `MultipartDecoder.message()` dCBOR-parses recovered bytes. `CborDecode` on `message()` is not session poison.
 
-`@qntx/ur/typed` does not ship application types. v2 `seed` / `psbt` (and later hdkey/sskr/envelope) live on `@qntx/ur/registry`. This export does not ship v1 `crypto-seed`.
+`@qntx/ur/typed` does not ship application types. v2 `seed` / `hdkey` / `keypath` / `coin-info` / `psbt` (and later sskr/envelope) live on `@qntx/ur/registry`. This export does not ship v1 `crypto-seed`.
 
 L3 UTF-8 `"hello"` remains valid transport. `Ur.fromUrString` of that URI throws `CborDecode`.

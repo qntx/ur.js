@@ -16,5 +16,8 @@ export const TAG_COMPRESSED = 40_003;
 /** Codecs that exist in this version. Number constants for later tags live above. */
 export const TAGS = {
   seed: Tag.from(TAG_SEED, "seed"),
+  hdkey: Tag.from(TAG_HDKEY, "hdkey"),
+  keypath: Tag.from(TAG_KEYPATH, "keypath"),
+  "coin-info": Tag.from(TAG_COIN_INFO, "coin-info"),
   psbt: Tag.from(TAG_PSBT, "psbt"),
 } as const;

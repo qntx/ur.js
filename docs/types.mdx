@@ -5,12 +5,19 @@ description: v2 UR type tokens and CBOR tags on @qntx/ur/registry.
 
 L5 codecs use v2 type tokens. The first `codec.tags[0].name` is the UR type. v1 `crypto-*` tokens are a different protocol and fail `UnexpectedType`.
 
-| UR type | Tag   | Codec       | Notes                                                              |
-| ------- | ----- | ----------- | ------------------------------------------------------------------ |
-| `seed`  | 40300 | `seedCodec` | Map keys 1–4. Payload 1..=64 bytes. `creation-date` is tag 1 only. |
-| `psbt`  | 40310 | `psbtCodec` | Untagged bstr. Magic `70736274ff`. No input/output parse.          |
+| UR type     | Tag   | Codec           | Notes                                                                                        |
+| ----------- | ----- | --------------- | -------------------------------------------------------------------------------------------- |
+| `seed`      | 40300 | `seedCodec`     | Map keys 1–4. Payload 1..=64 bytes. `creation-date` is tag 1 only.                           |
+| `hdkey`     | 40303 | `hdKeyCodec`    | Untagged top-level map. Nested `origin`/`children` tag 40304; `use-info` tag 40305.          |
+| `keypath`   | 40304 | `keypathCodec`  | Components array of index/range/wildcard/pair. Empty components require `sourceFingerprint`. |
+| `coin-info` | 40305 | `coinInfoCodec` | `type` uint31 and `network` int. Omit 0 on write (BTC mainnet).                              |
+| `psbt`      | 40310 | `psbtCodec`     | Untagged bstr. Magic `70736274ff`. No input/output parse.                                    |
 
-Later minors add `hdkey` (40303), `keypath` (40304), `coin-info` (40305), `sskr` (40309), and `envelope` (200). Those codecs are not in 1.2.0.
+`hdKeyCodec` does not check BIP44 cointype against the origin path and does not check parent-fingerprint isomorphism. Official HDKey vector 2 (`use-info` `{2: 1}` with path `44'/1'/1'/0/1`) is the lock. Nested embeddings are tagged; the `ur:hdkey` body is not.
+
+`hdKeyDigestSource` is dCBOR `[keyData, chainCode or null, coinType, network]`. Master uses `0, 0`. Derived fills `useInfo` defaults with 0. Vector 2 uses `network = 1` even though the BCR comment says mainnet.
+
+Later minors add `sskr` (40309) and `envelope` (200). Those codecs are not in 1.3.0.
 
 | Not decoded    | Tag |
 | -------------- | --- |

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 1.3.0 - 2026-09-16
+
+### Added
+
+- L5 `hdKeyCodec`, `keypathCodec`, `coinInfoCodec`, `hdKeyDigestSource`, `hdKeyDigest`. Nested tags 40304/40305. Official HDKey vectors 1–2.
+
 ## 1.2.0 - 2026-09-16
 
 ### Added

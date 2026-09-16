@@ -4,6 +4,7 @@
 
 | Version | Supported |
 | ------- | --------- |
+| 1.3.x   | Yes       |
 | 1.2.x   | Yes       |
 | 1.1.x   | Yes       |
 | 1.0.x   | Yes       |
@@ -26,9 +27,9 @@ Do not open public issues for unfixed vulnerabilities.
 ## Threat model (summary)
 
 This library is a **UR transport codec**. L5 `@qntx/ur/registry` adds structured
-dCBOR objects (`seed`, `psbt`). It does not implement application cryptography
-or trust policies. L5 output is untrusted structured data; signing and key use
-are host policy.
+dCBOR objects (`seed`, `hdkey`, `keypath`, `coin-info`, `psbt`). It does not
+implement application cryptography or trust policies. L5 output is untrusted
+structured data; signing and key use are host policy.
 
 | Threat                                         | Severity             | Mitigation                                                                                                               |
 | ---------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
@@ -42,7 +43,7 @@ are host policy.
 | Duplicate single-part different body           | Low                  | First wins, same type; documented                                                                                        |
 | Type confusion across parts                    | Medium               | Type stickiness after successful ingest; `expectedType`                                                                  |
 | Type confusion (`ur:bytes` as seed)            | Medium               | `fromUr` calls `ur.checkType` → `UnexpectedType`                                                                         |
-| v1/v2 mixup (`crypto-seed` / tag 300)          | Medium               | v1 tokens fail `UnexpectedType` against v2 codecs                                                                        |
+| v1/v2 mixup (`crypto-seed` / tag 300)          | Medium               | v1 tokens fail `UnexpectedType` against v2 codecs. Nested HDKey tag 304 is `WrongTag`                                    |
 | PSBT not actually a PSBT                       | Medium               | Magic-byte prefix `70736274ff` only. No input/output parse                                                               |
 | Zero-copy alias of decoder or caller buffer    | Medium               | `copyBytes` on decode; `copyBuf` on encode                                                                               |
 | Invalid CRC                                    | Low                  | Bytewords CRC + message CRC on fountain join                                                                             |

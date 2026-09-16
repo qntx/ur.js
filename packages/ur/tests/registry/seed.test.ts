@@ -39,8 +39,8 @@ function payload(hex: string): Uint8Array {
   return hexToBytes(hex);
 }
 
-test("TAGS names only seed and psbt", () => {
-  expect(Object.keys(TAGS)).toEqual(["seed", "psbt"]);
+test("TAGS names seed, hdkey, keypath, coin-info, psbt", () => {
+  expect(Object.keys(TAGS)).toEqual(["seed", "hdkey", "keypath", "coin-info", "psbt"]);
   expect(seedCodec.tags[0]?.name).toBe("seed");
   expect(seedCodec.tags[0]?.value).toBe(40_300);
 });
