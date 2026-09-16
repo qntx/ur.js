@@ -2,6 +2,9 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   defaultPackage: {
+    dev: "./apps/website",
+    build: "./apps/website",
+    preview: "./apps/website",
     pack: "./packages/ur",
   },
   staged: { "*": "vp check --fix" },

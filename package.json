@@ -14,9 +14,9 @@
   ],
   "type": "module",
   "scripts": {
-    "ready": "vp run ur#build && vp check && vp run -r test",
-    "dev": "vp run ur#dev",
-    "build": "vp run ur#build",
+    "ready": "vp run ur#build && vp check && vp run -r test && vp run website#build",
+    "dev": "vp run website#dev",
+    "build": "vp run website#build",
     "test": "vp run -r test",
     "check": "vp check",
     "lint": "vp check",
