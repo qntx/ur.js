@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Added
+
+- Vendored `tests/vectors/` contract goldens, byte-identical to bcur `crates/bcur/tests/vectors/contract/`.
+
+### Changed
+
+- Fountain `seqNum` fail-closed at `0xffffffff` (`ResourceLimit` `limit: "sequence"`) is the documented contract; wrap-to-0 is rejected.
+
 ## 1.1.0 - 2026-09-13
 
 ### Breaking

@@ -1,16 +1,22 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
 import { canonicalizeByteword, decode, encode, encodeRaw } from "../src/bytewords/index.ts";
 import { UrError } from "../src/error.ts";
 
-test("bytewords styles and roundtrip", () => {
-  const input = new Uint8Array([0, 1, 2, 128, 255]);
-  expect(encode(input, "standard")).toBe("able acid also lava zoom jade need echo taxi");
-  expect(encode(input, "uri")).toBe("able-acid-also-lava-zoom-jade-need-echo-taxi");
-  expect(encode(input, "minimal")).toBe("aeadaolazmjendeoti");
+const BYTEWORDS = JSON.parse(
+  readFileSync(join(import.meta.dirname, "vectors/bytewords.json"), "utf8"),
+) as { inputHex: string; standard: string; uri: string; minimal: string };
 
-  expect(decode("able acid also lava zoom jade need echo taxi", "standard")).toEqual(input);
-  expect(decode("able-acid-also-lava-zoom-jade-need-echo-taxi", "uri")).toEqual(input);
-  expect(decode("aeadaolazmjendeoti", "minimal")).toEqual(input);
+test("bytewords styles and roundtrip", () => {
+  const input = new Uint8Array(Buffer.from(BYTEWORDS.inputHex, "hex"));
+  expect(encode(input, "standard")).toBe(BYTEWORDS.standard);
+  expect(encode(input, "uri")).toBe(BYTEWORDS.uri);
+  expect(encode(input, "minimal")).toBe(BYTEWORDS.minimal);
+
+  expect(decode(BYTEWORDS.standard, "standard")).toEqual(input);
+  expect(decode(BYTEWORDS.uri, "uri")).toEqual(input);
+  expect(decode(BYTEWORDS.minimal, "minimal")).toEqual(input);
 
   expect(decode(encode(new Uint8Array(), "minimal"), "minimal")).toEqual(new Uint8Array());
 });

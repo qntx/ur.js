@@ -16,6 +16,6 @@ L1–L3 remain opaque bytes plus a type token. L3 does not parse or canonicalize
 
 L4 is `@qntx/ur/typed` and is the first dCBOR parse in this package. Root `@qntx/ur` does not import dcbor.
 
-Fountain `seqNum` is `1..=0xffffffff` and does not wrap. Hitting `0xffffffff` is `ResourceLimit` with `limit: "sequence"` (intentional; BCR-2024-001 wrap-to-0 is unimplemented).
+Fountain `seqNum` is `1..=0xffffffff` and does not wrap. Hitting `0xffffffff` is `ResourceLimit` with `limit: "sequence"`. Fail-closed is the contract; wrap-to-0 is rejected (JS cannot represent `2^32`; wrap recycles simple parts).
 
 Part CBOR is shortest-form only. Inbound non-canonical integers (as ur-rs `minicbor` may emit) are `InvalidPartCbor`. Encoder goldens still match ur-rs / URKit.

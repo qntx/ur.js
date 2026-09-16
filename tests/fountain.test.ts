@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
 import { checksum } from "../src/crc32.ts";
 import { UrError } from "../src/error.ts";
@@ -11,6 +13,17 @@ import {
   partition,
 } from "../src/fountain/index.ts";
 import { makeMessage } from "../src/rng/index.ts";
+
+const PART_CBOR = JSON.parse(
+  readFileSync(join(import.meta.dirname, "vectors/part-cbor.json"), "utf8"),
+) as {
+  sequence: number;
+  sequenceCount: number;
+  messageLength: number;
+  checksum: number;
+  dataHex: string;
+  cborHex: string;
+};
 
 function hex(bytes: Uint8Array): string {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
@@ -46,19 +59,18 @@ test("fountain encoder first part", () => {
   const message = makeMessage("Wolf", 256);
   const encoder = FountainEncoder.create(message, 30);
   const part = encoder.nextPart();
-  expect(hex(part.data)).toBe("916ec65cf77cadf55cd7f9cda1a1030026ddd42e905b77adc36e4f2d3c");
-  expect(part.sequence).toBe(1);
-  expect(part.sequenceCount).toBe(9);
-  expect(part.messageLength).toBe(256);
+  expect(hex(part.data)).toBe(PART_CBOR.dataHex);
+  expect(part.sequence).toBe(PART_CBOR.sequence);
+  expect(part.sequenceCount).toBe(PART_CBOR.sequenceCount);
+  expect(part.messageLength).toBe(PART_CBOR.messageLength);
+  expect(part.checksum).toBe(PART_CBOR.checksum);
 });
 
 test("cbor golden", () => {
   const message = makeMessage("Wolf", 256);
   const encoder = FountainEncoder.create(message, 30);
   const part = encoder.nextPart();
-  expect(hex(part.toCbor())).toBe(
-    "8501091901001a0167aa07581d916ec65cf77cadf55cd7f9cda1a1030026ddd42e905b77adc36e4f2d3c",
-  );
+  expect(hex(part.toCbor())).toBe(PART_CBOR.cborHex);
   const decoded = Part.fromCbor(part.toCbor());
   expect(decoded.sequence).toBe(part.sequence);
   expect(decoded.sequenceCount).toBe(part.sequenceCount);
