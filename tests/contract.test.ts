@@ -32,19 +32,11 @@ function jsonVector<T>(name: string): T {
   return JSON.parse(readVector(name)) as T;
 }
 
-function fromHex(hex: string): Uint8Array {
-  return new Uint8Array(Buffer.from(hex, "hex"));
-}
-
-function toHex(bytes: Uint8Array): string {
-  return Buffer.from(bytes).toString("hex");
-}
-
 function dataLines(raw: string): string[] {
   return raw
     .split("\n")
     .map((line) => line.trim())
-    .filter((line) => line.length > 0 && !line.startsWith("#"));
+    .filter((line) => line.length > 0);
 }
 
 function assertLineFile(raw: string): void {
@@ -140,7 +132,7 @@ test("readme is canonical paragraph", () => {
 
 test("bytewords contract", () => {
   const spec = jsonVector<BytewordsSpec>("bytewords.json");
-  const input = fromHex(spec.inputHex);
+  const input = new Uint8Array(Buffer.from(spec.inputHex, "hex"));
   expect(bytewords.encode(input, "standard")).toBe(spec.standard);
   expect(bytewords.encode(input, "uri")).toBe(spec.uri);
   expect(bytewords.encode(input, "minimal")).toBe(spec.minimal);
@@ -151,16 +143,18 @@ test("bytewords contract", () => {
 
 test("part cbor contract", () => {
   const spec = jsonVector<PartCborSpec>("part-cbor.json");
-  const part = Part.fromCbor(fromHex(spec.cborHex));
+  const part = Part.fromCbor(new Uint8Array(Buffer.from(spec.cborHex, "hex")));
   expect(part.sequence).toBe(spec.sequence);
   expect(part.sequenceCount).toBe(spec.sequenceCount);
   expect(part.messageLength).toBe(spec.messageLength);
   expect(part.checksum).toBe(spec.checksum);
-  expect(toHex(part.data)).toBe(spec.dataHex);
-  expect(toHex(part.toCbor())).toBe(spec.cborHex);
-  expect(errorOf(() => Part.fromCbor(fromHex(spec.nonShortestSequenceCborHex))).code).toBe(
-    "InvalidPartCbor",
-  );
+  expect(Buffer.from(part.data).toString("hex")).toBe(spec.dataHex);
+  expect(Buffer.from(part.toCbor()).toString("hex")).toBe(spec.cborHex);
+  expect(
+    errorOf(() =>
+      Part.fromCbor(new Uint8Array(Buffer.from(spec.nonShortestSequenceCborHex, "hex"))),
+    ).code,
+  ).toBe("InvalidPartCbor");
 });
 
 test("k1 contract", () => {
@@ -186,7 +180,7 @@ test("k1 contract", () => {
 
 test("l4 test array contract", () => {
   const spec = jsonVector<L4Spec>("l4-test-array.json");
-  const cborBytes = fromHex(spec.cborHex);
+  const cborBytes = new Uint8Array(Buffer.from(spec.cborHex, "hex"));
   const urType = UrType.parse(spec.type);
   expect(encode(cborBytes, urType)).toBe(spec.uri);
   expect(Ur.create(spec.type, [1, 2, 3]).string()).toBe(spec.uri);
@@ -229,20 +223,14 @@ test("poison receive and message same code", () => {
   const spec = jsonVector<PoisonSpec>("poison.json");
   expect(spec.receiveAndMessageSameCode).toEqual(["uri_len", "fragment_count"]);
 
-  for (const name of spec.receiveAndMessageSameCode) {
-    if (name === "uri_len") {
-      const encoder = Encoder.bytes(new TextEncoder().encode("Ten chars!".repeat(8)), 5);
-      const decoder = new Decoder({ limits: { maxUriLen: 16 } });
-      assertSessionPoison(decoder, encoder.nextPart(), name);
-    } else if (name === "fragment_count") {
-      const encoder = Encoder.bytes(new TextEncoder().encode("Ten chars!".repeat(16)), 4);
-      expect(encoder.fragmentCount).toBeGreaterThan(1);
-      const decoder = new Decoder({ limits: { maxFragmentCount: 1 } });
-      assertSessionPoison(decoder, encoder.nextPart(), name);
-    } else {
-      throw new Error(`unhandled receiveAndMessageSameCode: ${name}`);
-    }
-  }
+  const uriEncoder = Encoder.bytes(new TextEncoder().encode("Ten chars!".repeat(8)), 5);
+  const uriDecoder = new Decoder({ limits: { maxUriLen: 16 } });
+  assertSessionPoison(uriDecoder, uriEncoder.nextPart(), "uri_len");
+
+  const fragmentEncoder = Encoder.bytes(new TextEncoder().encode("Ten chars!".repeat(16)), 4);
+  expect(fragmentEncoder.fragmentCount).toBeGreaterThan(1);
+  const fragmentDecoder = new Decoder({ limits: { maxFragmentCount: 1 } });
+  assertSessionPoison(fragmentDecoder, fragmentEncoder.nextPart(), "fragment_count");
 });
 
 test("poison not-poison errors", () => {
