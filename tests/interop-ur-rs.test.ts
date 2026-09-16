@@ -6,6 +6,8 @@
  * of Xoshiro("Wolf") output, matching ur-rs `make_message_ur`.
  */
 
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
 import { makeMessage } from "../src/rng/index.ts";
 import * as bytewords from "../src/bytewords/index.ts";
@@ -31,28 +33,18 @@ function makeMessageUr(length: number, seed: string): Uint8Array {
 }
 
 /** Full 20-URI table from ur-rs `test_ur_encoder` (max_frag 30, 256-byte Wolf bstr). */
-const UR_ENCODER_20 = [
-  "ur:bytes/1-9/lpadascfadaxcywenbpljkhdcahkadaemejtswhhylkepmykhhtsytsnoyoyaxaedsuttydmmhhpktpmsrjtdkgslpgh",
-  "ur:bytes/2-9/lpaoascfadaxcywenbpljkhdcagwdpfnsboxgwlbaawzuefywkdplrsrjynbvygabwjldapfcsgmghhkhstlrdcxaefz",
-  "ur:bytes/3-9/lpaxascfadaxcywenbpljkhdcahelbknlkuejnbadmssfhfrdpsbiegecpasvssovlgeykssjykklronvsjksopdzmol",
-  "ur:bytes/4-9/lpaaascfadaxcywenbpljkhdcasotkhemthydawydtaxneurlkosgwcekonertkbrlwmplssjtammdplolsbrdzcrtas",
-  "ur:bytes/5-9/lpahascfadaxcywenbpljkhdcatbbdfmssrkzmcwnezelennjpfzbgmuktrhtejscktelgfpdlrkfyfwdajldejokbwf",
-  "ur:bytes/6-9/lpamascfadaxcywenbpljkhdcackjlhkhybssklbwefectpfnbbectrljectpavyrolkzczcpkmwidmwoxkilghdsowp",
-  "ur:bytes/7-9/lpatascfadaxcywenbpljkhdcavszmwnjkwtclrtvaynhpahrtoxmwvwatmedibkaegdosftvandiodagdhthtrlnnhy",
-  "ur:bytes/8-9/lpayascfadaxcywenbpljkhdcadmsponkkbbhgsoltjntegepmttmoonftnbuoiyrehfrtsabzsttorodklubbuyaetk",
-  "ur:bytes/9-9/lpasascfadaxcywenbpljkhdcajskecpmdckihdyhphfotjojtfmlnwmadspaxrkytbztpbauotbgtgtaeaevtgavtny",
-  "ur:bytes/10-9/lpbkascfadaxcywenbpljkhdcahkadaemejtswhhylkepmykhhtsytsnoyoyaxaedsuttydmmhhpktpmsrjtwdkiplzs",
-  "ur:bytes/11-9/lpbdascfadaxcywenbpljkhdcahelbknlkuejnbadmssfhfrdpsbiegecpasvssovlgeykssjykklronvsjkvetiiapk",
-  "ur:bytes/12-9/lpbnascfadaxcywenbpljkhdcarllaluzmdmgstospeyiefmwejlwtpedamktksrvlcygmzemovovllarodtmtbnptrs",
-  "ur:bytes/13-9/lpbtascfadaxcywenbpljkhdcamtkgtpknghchchyketwsvwgwfdhpgmgtylctotzopdrpayoschcmhplffziachrfgd",
-  "ur:bytes/14-9/lpbaascfadaxcywenbpljkhdcapazewnvonnvdnsbyleynwtnsjkjndeoldydkbkdslgjkbbkortbelomueekgvstegt",
-  "ur:bytes/15-9/lpbsascfadaxcywenbpljkhdcaynmhpddpzmversbdqdfyrehnqzlugmjzmnmtwmrouohtstgsbsahpawkditkckynwt",
-  "ur:bytes/16-9/lpbeascfadaxcywenbpljkhdcawygekobamwtlihsnpalnsghenskkiynthdzotsimtojetprsttmukirlrsbtamjtpd",
-  "ur:bytes/17-9/lpbyascfadaxcywenbpljkhdcamklgftaxykpewyrtqzhydntpnytyisincxmhtbceaykolduortotiaiaiafhiaoyce",
-  "ur:bytes/18-9/lpbgascfadaxcywenbpljkhdcahkadaemejtswhhylkepmykhhtsytsnoyoyaxaedsuttydmmhhpktpmsrjtntwkbkwy",
-  "ur:bytes/19-9/lpbwascfadaxcywenbpljkhdcadekicpaajootjzpsdrbalpeywllbdsnbinaerkurspbncxgslgftvtsrjtksplcpeo",
-  "ur:bytes/20-9/lpbbascfadaxcywenbpljkhdcayapmrleeleaxpasfrtrdkncffwjyjzgyetdmlewtkpktgllepfrltataztksmhkbot",
-] as const;
+const UR_ENCODER_20 = readFileSync(join(import.meta.dirname, "vectors/fountain-mixed.txt"), "utf8")
+  .split("\n")
+  .map((line) => line.trim())
+  .filter((line) => line.length > 0);
+
+const L4 = JSON.parse(
+  readFileSync(join(import.meta.dirname, "vectors/l4-test-array.json"), "utf8"),
+) as {
+  type: string;
+  cborHex: string;
+  uri: string;
+};
 
 test("ur-rs test_ur_encoder: full 20 URI goldens", () => {
   const ur = makeMessageUr(256, "Wolf");
@@ -99,6 +91,6 @@ test("test_foreign_1_1_fountain_uri_decodes", () => {
 });
 
 test("bc-ur golden: ur:test array", () => {
-  const cbor = Uint8Array.from([0x83, 0x01, 0x02, 0x03]);
-  expect(encode(cbor, UrType.parse("test"))).toBe("ur:test/lsadaoaxjygonesw");
+  const cbor = new Uint8Array(Buffer.from(L4.cborHex, "hex"));
+  expect(encode(cbor, UrType.parse(L4.type))).toBe(L4.uri);
 });
