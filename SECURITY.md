@@ -4,6 +4,7 @@
 
 | Version | Supported |
 | ------- | --------- |
+| 1.6.x   | Yes       |
 | 1.5.x   | Yes       |
 | 1.4.x   | Yes       |
 | 1.3.x   | Yes       |
@@ -44,7 +45,7 @@ untrusted structured data; signing and key use are host policy.
 | Mixing single-part and fountain in one session | Medium               | `InconsistentPart`                                                                                                       |
 | Duplicate single-part different body           | Low                  | First wins, same type; documented                                                                                        |
 | Type confusion across parts                    | Medium               | Type stickiness after successful ingest; `expectedType`                                                                  |
-| Type confusion (`ur:bytes` as seed)            | Medium               | `fromUr` calls `ur.checkType` → `UnexpectedType`                                                                         |
+| Type confusion (`ur:bytes` as seed)            | Medium               | `fromUr` calls `ur.checkType` → `UnexpectedType`. `fromUrStringWith` unknown type is `UnexpectedType`                    |
 | v1/v2 mixup (`crypto-seed` / tag 300)          | Medium               | v1 tokens fail `UnexpectedType` against v2 codecs. Nested HDKey tag 304 is `WrongTag`                                    |
 | PSBT not actually a PSBT                       | Medium               | Magic-byte prefix `70736274ff` only. No input/output parse                                                               |
 | SSKR share claimed as full seed                | Medium               | Type token `sskr` ≠ `seed`. No combine in this package                                                                   |

@@ -3,7 +3,7 @@ title: Registry
 description: L5 v2 UR application types on @qntx/ur/registry.
 ---
 
-`@qntx/ur/registry` is L5: `UrCodec` implementations for BCR-2020-006 v2 types. This version ships `seed` (40300), `hdkey` / `keypath` / `coin-info` (40303–40305), `sskr` (40309), `psbt` (40310), and `envelope` (200). Hosts pass a codec into L4 `toUr` / `fromUr`.
+`@qntx/ur/registry` is L5: `UrCodec` implementations for BCR-2020-006 v2 types. This version ships `seed` (40300), `hdkey` / `keypath` / `coin-info` (40303–40305), `sskr` (40309), `psbt` (40310), and `envelope` (200). Hosts pass a codec into L4 `toUr` / `fromUr`. Optional `codecMap` / `fromUrStringWith` dispatch over a host-provided set.
 
 Requires the optional peer `@blockchaincommons/dcbor@1.0.0-beta.2`. Importing `@qntx/ur/registry` without the peer fails at load. Transport-only hosts that import only `@qntx/ur` may omit it.
 
@@ -33,6 +33,17 @@ const dec = new MultipartDecoder({ expectedType: UrType.parse("psbt") });
 while (!dec.complete) dec.receive(enc.nextPart());
 const recovered: Psbt = fromUr(dec.message()!, psbtCodec);
 ```
+
+Primary path remains `fromUrString(uri, seedCodec)`. For mixed inbound types:
+
+```ts
+import { codecMap, fromUrStringWith, seedCodec, psbtCodec } from "@qntx/ur/registry";
+
+const map = codecMap([seedCodec, psbtCodec]);
+const { type, value } = fromUrStringWith(uri, map);
+```
+
+Duplicate `tags[0].name` in `codecMap` is `TypeError`, not `InvalidType`. Unknown type is `UnexpectedType`. There is no global registry.
 
 The UR body is untagged dCBOR. Nested HDKey `origin` / `children` / `use-info` are tagged 40304/40305; the top-level UR body is not.
 

@@ -3,7 +3,7 @@ title: UR types
 description: v2 UR type tokens and CBOR tags on @qntx/ur/registry.
 ---
 
-L5 codecs use v2 type tokens. The first `codec.tags[0].name` is the UR type. v1 `crypto-*` tokens are a different protocol and fail `UnexpectedType`.
+L5 codecs use v2 type tokens. The first `codec.tags[0].name` is the UR type. v1 `crypto-*` tokens are a different protocol and fail `UnexpectedType`. Mixed-type decode uses host-provided `codecMap`; duplicate tokens throw `TypeError`. There is no global registry.
 
 | UR type     | Tag   | Codec           | Notes                                                                                        |
 | ----------- | ----- | --------------- | -------------------------------------------------------------------------------------------- |

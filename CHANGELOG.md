@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 1.6.0 - 2026-09-16
+
+### Added
+
+- L5 `codecMap` / `fromUrStringWith`. Host-provided dispatch. Duplicate `tags[0].name` is `TypeError`. Unknown type is `UnexpectedType`. No global registry.
+
 ## 1.5.0 - 2026-09-16
 
 ### Added
