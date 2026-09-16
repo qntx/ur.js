@@ -1,7 +1,18 @@
-import { CborError, cbor, cborEquals, taggedValue } from "@blockchaincommons/dcbor";
+import { CborError, cbor, cborEquals, encodeCbor, taggedValue } from "@blockchaincommons/dcbor";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
 import { Encoder, encode } from "../src/ur/index.ts";
 import { Ur, UrError, UrType } from "../src/typed/index.ts";
+
+const L4 = JSON.parse(
+  readFileSync(join(import.meta.dirname, "vectors/l4-test-array.json"), "utf8"),
+) as {
+  type: string;
+  cborHex: string;
+  uri: string;
+  uriUpper: string;
+};
 
 function errorOf(fn: () => void): UrError {
   try {
@@ -14,8 +25,9 @@ function errorOf(fn: () => void): UrError {
 }
 
 test("dCBOR array golden roundtrip", () => {
-  const created = Ur.create("test", cbor([1, 2, 3]));
-  expect(created.string()).toBe("ur:test/lsadaoaxjygonesw");
+  const created = Ur.create(L4.type, [1, 2, 3]);
+  expect(created.string()).toBe(L4.uri);
+  expect(Buffer.from(encodeCbor(created.cbor)).toString("hex")).toBe(L4.cborHex);
   const decoded = Ur.fromUrString(created.string());
   expect(cborEquals(created.cbor, decoded.cbor)).toBe(true);
   expect(created.type.equals(decoded.type)).toBe(true);
@@ -47,9 +59,9 @@ test("multipart URI is NotSinglePart", () => {
 });
 
 test("uppercase fromUrString matches golden", () => {
-  const decoded = Ur.fromUrString("UR:TEST/LSADAOAXJYGONESW");
-  expect(decoded.string()).toBe("ur:test/lsadaoaxjygonesw");
-  expect(decoded.type.value).toBe("test");
+  const decoded = Ur.fromUrString(L4.uriUpper);
+  expect(decoded.string()).toBe(L4.uri);
+  expect(decoded.type.value).toBe(L4.type);
   expect(cborEquals(decoded.cbor, cbor([1, 2, 3]))).toBe(true);
 });
 
