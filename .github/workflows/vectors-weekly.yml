@@ -1,0 +1,35 @@
+# Exact-file drift of tests/vectors vs qntx/bcur main contract/.
+# Failure means copy the files or fix the implementation.
+# Do not add this job to PR CI (network + sibling-repo race).
+name: Contract vector drift
+
+on:
+  schedule:
+    - cron: "10 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract-drift:
+    name: tests/vectors vs bcur contract/
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Diff tests/vectors against qntx/bcur main contract/
+        run: |
+          set -euo pipefail
+          files="README.md bytewords.json part-cbor.json k1.json l4-test-array.json decoder-limits.json poison.json fountain-mixed.txt published-singles.txt"
+          base=https://raw.githubusercontent.com/qntx/bcur/main/crates/bcur/tests/vectors/contract
+          failed=0
+          for f in $files; do
+            curl -fsSL "$base/$f" -o "/tmp/bcur-$f"
+            if ! diff -u "tests/vectors/$f" "/tmp/bcur-$f"; then
+              failed=1
+            fi
+          done
+          exit "$failed"
