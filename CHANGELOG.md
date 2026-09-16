@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- Drop the CI `node` matrix job and `scripts/ci-node-*.mjs`. Bun `ci-bun.yml@v2` remains.
+
 ## 1.1.0 - 2026-09-13
 
 ### Breaking
