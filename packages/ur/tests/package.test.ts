@@ -51,8 +51,8 @@ test("packed UrError is one class across entries", async () => {
     hdKeyCodec: unknown;
     hdKeyDigestSource: unknown;
     hdKeyDigest: unknown;
+    sskrCodec: unknown;
     codecMap?: unknown;
-    sskrCodec?: unknown;
     envelopeCodec?: unknown;
   };
   expect(index.UrError).toBe(typed.UrError);
@@ -65,7 +65,7 @@ test("packed UrError is one class across entries", async () => {
   expect(registry.hdKeyCodec).toBeDefined();
   expect(registry.hdKeyDigestSource).toBeDefined();
   expect(registry.hdKeyDigest).toBeDefined();
+  expect(registry.sskrCodec).toBeDefined();
   expect(registry.codecMap).toBeUndefined();
-  expect(registry.sskrCodec).toBeUndefined();
   expect(registry.envelopeCodec).toBeUndefined();
 });

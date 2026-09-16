@@ -19,5 +19,6 @@ export const TAGS = {
   hdkey: Tag.from(TAG_HDKEY, "hdkey"),
   keypath: Tag.from(TAG_KEYPATH, "keypath"),
   "coin-info": Tag.from(TAG_COIN_INFO, "coin-info"),
+  sskr: Tag.from(TAG_SSKR, "sskr"),
   psbt: Tag.from(TAG_PSBT, "psbt"),
 } as const;

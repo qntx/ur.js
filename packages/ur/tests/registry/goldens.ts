@@ -50,3 +50,16 @@ export const hdkey2 = {
     "845821026fe2355745bb2db3630bbc80ef5d58951c963c841f54170ba6e5c12be7fc12a65820ced155c72456255881793514edc5bd9447e7f74abb88c6d6b6480fd016ee8c850001",
   digestHex: "362af3038da7600ad1581c19161c8594aafafc24e5acf1aefc8f7a0bbe366df2",
 } as const;
+
+/** BCR-2020-011 third share. identifier 0x4bbf, GT=2, G=2, GI=0, T=2, reserved=0, I=2. */
+export const sskrShare = {
+  identifier: 0x4bbf,
+  groupThreshold: 2,
+  groupCount: 2,
+  groupIndex: 0,
+  memberThreshold: 2,
+  memberIndex: 2,
+  shareValueHex: "5abd490ee65b6084859854ee67736e75",
+  cborHex: "554bbf1101025abd490ee65b6084859854ee67736e75",
+  ur: "ur:sskr/gogrrsbyadaohtrygabavahphnlrlpmkghwyiojkjtkpmdkncfjp",
+} as const;

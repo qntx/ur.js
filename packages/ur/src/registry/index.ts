@@ -17,5 +17,6 @@ export { psbtCodec, type Psbt } from "./psbt.ts";
 export { keypathCodec, type Keypath, type PathComponent } from "./keypath.ts";
 export { coinInfoCodec, type CoinInfo, CoinType, Network } from "./coin-info.ts";
 export { hdKeyCodec, type HdKey, type MasterHdKey, type DerivedHdKey } from "./hdkey.ts";
+export { sskrCodec, type SskrShare } from "./sskr.ts";
 export { seedDigest, hdKeyDigestSource, hdKeyDigest } from "./digest.ts";
 export * from "./tags.ts";

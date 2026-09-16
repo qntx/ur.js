@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 1.4.0 - 2026-09-16
+
+### Added
+
+- L5 `sskrCodec`. Packed 5-byte header; domain stores N not N-1. Official BCR-2020-011 third share golden.
+
 ## 1.3.0 - 2026-09-16
 
 ### Added

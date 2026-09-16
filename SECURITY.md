@@ -4,6 +4,7 @@
 
 | Version | Supported |
 | ------- | --------- |
+| 1.4.x   | Yes       |
 | 1.3.x   | Yes       |
 | 1.2.x   | Yes       |
 | 1.1.x   | Yes       |
@@ -27,7 +28,7 @@ Do not open public issues for unfixed vulnerabilities.
 ## Threat model (summary)
 
 This library is a **UR transport codec**. L5 `@qntx/ur/registry` adds structured
-dCBOR objects (`seed`, `hdkey`, `keypath`, `coin-info`, `psbt`). It does not
+dCBOR objects (`seed`, `hdkey`, `keypath`, `coin-info`, `sskr`, `psbt`). It does not
 implement application cryptography or trust policies. L5 output is untrusted
 structured data; signing and key use are host policy.
 
@@ -35,7 +36,7 @@ structured data; signing and key use are host policy.
 | ---------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | QR stream resource exhaustion                  | High                 | `DecoderLimits` + session poison including `uri_len`, UR-layer `fragment_data`/`fragment_count`, fountain `DecoderState` |
 | Public `Part.fromCbor` huge `K` allocation     | High                 | `maxFragmentCount` on decode                                                                                             |
-| Seed / PSBT payload logged                     | High                 | Codecs never stringify payloads. Switch on `CborError.code`. Never pass payload hex into `CborError.custom`              |
+| Seed / PSBT / SSKR share logged                | High                 | Codecs never stringify payloads. Switch on `CborError.code`. Never pass payload hex into `CborError.custom`              |
 | Treating recovered L5 objects as trusted       | High (host)          | L5 output is untrusted structured data. Signing and key use are host policy                                              |
 | `seqNum` wrap recycling simple parts           | Medium (theoretical) | Fail-closed at `0xffffffff`; `maxReceivedParts` 8_000                                                                    |
 | Non-canonical Part CBOR                        | Medium               | Keep shortest-form decoder                                                                                               |
@@ -45,6 +46,7 @@ structured data; signing and key use are host policy.
 | Type confusion (`ur:bytes` as seed)            | Medium               | `fromUr` calls `ur.checkType` → `UnexpectedType`                                                                         |
 | v1/v2 mixup (`crypto-seed` / tag 300)          | Medium               | v1 tokens fail `UnexpectedType` against v2 codecs. Nested HDKey tag 304 is `WrongTag`                                    |
 | PSBT not actually a PSBT                       | Medium               | Magic-byte prefix `70736274ff` only. No input/output parse                                                               |
+| SSKR share claimed as full seed                | Medium               | Type token `sskr` ≠ `seed`. No combine in this package                                                                   |
 | Zero-copy alias of decoder or caller buffer    | Medium               | `copyBytes` on decode; `copyBuf` on encode                                                                               |
 | Invalid CRC                                    | Low                  | Bytewords CRC + message CRC on fountain join                                                                             |
 | Application payload treated as trusted         | High (host)          | L4 `CborDecode`/`CborType` for typed hosts; L5 objects still untrusted; L3 recovered bytes still untrusted               |
